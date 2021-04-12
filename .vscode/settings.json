@@ -1,0 +1,11 @@
+{
+  "cmake.sourceDirectory": "${workspaceFolder}/simulator",
+  "files.associations": {
+    "*.evasm": "arm",
+    "*.dot": "dot",
+    "*.gen": "javascript",
+    "*.owl": "prolog",
+    "*.h": "c",
+    "ranges": "c"
+  }
+}
