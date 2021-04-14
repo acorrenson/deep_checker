@@ -6,7 +6,7 @@
 #define BOARD_SIZE 8
 #define ROW_SIZE 4
 
-void print_board(unsigned board);
+void print_board(unsigned player1, unsigned player2);
 
 int can_move_left(int pos, unsigned board, int direction);
 int can_move_right(int pos, unsigned board, int direction);
@@ -19,8 +19,8 @@ int can_take(int pos, unsigned player, unsigned opponent);
 vector *potential_takes(unsigned player, unsigned opponent);
 vector *potential_moves(unsigned player, unsigned opponent, int direction);
 
-void do_take_left(int pos, unsigned *p1, unsigned *p2, int dir);
-void do_take_right(int pos, unsigned *p1, unsigned *p2, int dir);
+int do_take_left(int pos, unsigned *p1, unsigned *p2, int dir);
+int do_take_right(int pos, unsigned *p1, unsigned *p2, int dir);
 
 int max2(int a, int b);
 

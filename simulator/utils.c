@@ -1,20 +1,32 @@
 #include "utils.h"
 #include <stdio.h>
 
-void print_board(unsigned board) {
+void print_board(unsigned player1, unsigned player2) {
   for (int row = 0; row < BOARD_SIZE; row++) {
+
+    for (int col = 0; col < BOARD_SIZE; col++)
+      printf("+---");
+    printf("+\n");
+
     for (int col = 0; col < BOARD_SIZE; col++) {
+      printf("|");
       if ((row ^ col) & 1) {
-        if (board & 1)
-          printf("x");
+        if (player1 & 1)
+          printf(" x ");
+        else if (player2 & 1)
+          printf(" o ");
         else
-          printf(".");
-        board >>= 1;
+          printf("   ");
+        player1 >>= 1;
+        player2 >>= 1;
       } else
-        printf(" ");
+        printf("   ");
     }
-    printf("\n");
+    printf("|\n");
   }
+  for (int col = 0; col < BOARD_SIZE; col++)
+    printf("+---");
+  printf("+\n");
 }
 
 int can_move_left(int pos, unsigned board, int direction) {
@@ -107,9 +119,35 @@ vector *potential_moves(unsigned player, unsigned opponent, int direction) {
   return moves;
 }
 
-void do_take_left(int pos, unsigned *p1, unsigned *p2, int dir) {}
+int next_left(int pos, int dir) {
+  if ((pos / ROW_SIZE) & 1)
+    return pos + (dir ? -5 : 4);
+  return pos + (dir ? -4 : 4);
+}
 
-void do_take_right(int pos, unsigned *p1, unsigned *p2, int dir) {}
+int next_right(int pos, int dir) {
+  if ((pos / ROW_SIZE) & 1)
+    return pos + (dir ? -4 : 4);
+  return pos + (dir ? -3 : 5);
+}
+
+int do_take_left(int pos, unsigned *p1, unsigned *p2, int dir) {
+  int kill = next_left(pos, dir);
+  int new_pos = next_left(kill, dir);
+  *p1 ^= (1 << pos);
+  *p1 |= (1 << new_pos);
+  *p2 ^= (1 << kill);
+  return new_pos;
+}
+
+int do_take_right(int pos, unsigned *p1, unsigned *p2, int dir) {
+  int kill = next_right(pos, dir);
+  int new_pos = next_right(kill, dir);
+  *p1 ^= (1 << pos);
+  *p1 |= (1 << new_pos);
+  *p2 ^= (1 << kill);
+  return new_pos;
+}
 
 int max2(int a, int b) { return (a >= b ? a : b); }
 
