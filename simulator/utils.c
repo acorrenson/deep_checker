@@ -126,19 +126,20 @@ vector *potential_takes(unsigned player, unsigned opponent) {
   return takes;
 }
 
-int do_take_left(int pos, unsigned *p1, unsigned *p2, int direction) {
+int do_take_left(int pos, unsigned *player, unsigned *opponent, int direction) {
   int take = next_left(pos, direction);
   int new_pos = next_left(take, direction);
-  *p1 ^= (1 << pos) | (1 << new_pos);
-  *p2 ^= (1 << take);
+  *player ^= (1 << pos) | (1 << new_pos);
+  *opponent ^= (1 << take);
   return new_pos;
 }
 
-int do_take_right(int pos, unsigned *p1, unsigned *p2, int direction) {
+int do_take_right(int pos, unsigned *player, unsigned *opponent,
+                  int direction) {
   int take = next_right(pos, direction);
   int new_pos = next_right(take, direction);
-  *p1 ^= (1 << pos) | (1 << new_pos);
-  *p2 ^= (1 << take);
+  *player ^= (1 << pos) | (1 << new_pos);
+  *opponent ^= (1 << take);
   return new_pos;
 }
 
@@ -155,25 +156,25 @@ int count_max_takes(int pos, unsigned player, unsigned opponent) {
     unsigned new_player = player;
     unsigned new_opponent = opponent;
     do_take_left(pos, &new_player, &new_opponent, 0);
-    count1 = count_max_takes(pos, new_player, new_opponent);
+    count1 = 1 + count_max_takes(pos, new_player, new_opponent);
   }
   if (can_take_right(pos, player, opponent, 0)) {
     unsigned new_player = player;
     unsigned new_opponent = opponent;
     do_take_right(pos, &new_player, &new_opponent, 0);
-    count2 = count_max_takes(pos, new_player, new_opponent);
+    count2 = 1 + count_max_takes(pos, new_player, new_opponent);
   }
   if (can_take_left(pos, player, opponent, 1)) {
     unsigned new_player = player;
     unsigned new_opponent = opponent;
     do_take_left(pos, &new_player, &new_opponent, 1);
-    count3 = count_max_takes(pos, new_player, new_opponent);
+    count3 = 1 + count_max_takes(pos, new_player, new_opponent);
   }
   if (can_take_right(pos, player, opponent, 1)) {
     unsigned new_player = player;
     unsigned new_opponent = opponent;
     do_take_right(pos, &new_player, &new_opponent, 1);
-    count4 = count_max_takes(pos, new_player, new_opponent);
+    count4 = 1 + count_max_takes(pos, new_player, new_opponent);
   }
   return max4(count1, count2, count3, count4);
 }
@@ -193,4 +194,94 @@ vector *max_takes(unsigned player, unsigned opponent) {
     }
   }
   return max_takes;
+}
+
+int do_max_takes(int *pos, unsigned *player, unsigned *opponent) {
+  int count1 = 0;
+  int count2 = 0;
+  int count3 = 0;
+  int count4 = 0;
+  int pos1 = *pos;
+  int pos2 = *pos;
+  int pos3 = *pos;
+  int pos4 = *pos;
+  unsigned player1 = *player;
+  unsigned player2 = *player;
+  unsigned player3 = *player;
+  unsigned player4 = *player;
+  unsigned opponent1 = *opponent;
+  unsigned opponent2 = *opponent;
+  unsigned opponent3 = *opponent;
+  unsigned opponent4 = *opponent;
+
+  if (can_take_left(pos1, player1, opponent1, 0)) {
+    pos1 = do_take_left(pos1, &player1, &opponent1, 0);
+    count1 = 1 + do_max_takes(&pos1, &player1, &opponent1);
+  }
+  if (can_take_right(pos2, player2, opponent3, 0)) {
+    pos2 = do_take_right(pos2, &player2, &opponent2, 0);
+    count2 = 1 + do_max_takes(&pos2, &player2, &opponent2);
+  }
+  if (can_take_left(pos3, player3, opponent3, 1)) {
+    pos3 = do_take_left(pos3, &player3, &opponent3, 1);
+    count3 = 1 + do_max_takes(&pos3, &player3, &opponent3);
+  }
+  if (can_take_right(pos4, player4, opponent4, 1)) {
+    pos4 = do_take_right(pos4, &player4, &opponent4, 1);
+    count4 = 1 + do_max_takes(&pos4, &player4, &opponent4);
+  }
+
+  if (count1 > count2) {
+    if (count3 > count4) {
+      if (count1 > count3) {
+        *pos = pos1;
+        *player = player1;
+        *opponent = opponent1;
+        return count1;
+      } else {
+        *pos = pos3;
+        *player = player3;
+        *opponent = opponent3;
+        return count3;
+      }
+    } else {
+      if (count1 > count4) {
+        *pos = pos1;
+        *player = player1;
+        *opponent = opponent1;
+        return count1;
+      } else {
+        *pos = pos4;
+        *player = player4;
+        *opponent = opponent4;
+        return count4;
+      }
+    }
+  } else {
+    if (count3 > count4) {
+      if (count2 > count3) {
+        *pos = pos2;
+        *player = player2;
+        *opponent = opponent2;
+        return count2;
+      } else {
+        *pos = pos3;
+        *player = player3;
+        *opponent = opponent3;
+        return count3;
+      }
+    } else {
+      if (count2 > count4) {
+        *pos = pos2;
+        *player = player2;
+        *opponent = opponent2;
+        return count2;
+      } else {
+        *pos = pos4;
+        *player = player4;
+        *opponent = opponent4;
+        return count4;
+      }
+    }
+  }
 }

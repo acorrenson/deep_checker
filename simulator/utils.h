@@ -21,13 +21,14 @@ int can_take_right(int pos, unsigned player, unsigned opponent, int direction);
 int can_take(int pos, unsigned player, unsigned opponent);
 vector *potential_takes(unsigned player, unsigned opponent);
 
-int do_take_left(int pos, unsigned *p1, unsigned *p2, int dir);
-int do_take_right(int pos, unsigned *p1, unsigned *p2, int dir);
+int do_take_left(int pos, unsigned *player, unsigned *opponent, int direction);
+int do_take_right(int pos, unsigned *player, unsigned *opponent, int direction);
 
 int max2(int a, int b);
 int max4(int a, int b, int c, int d);
 
 int count_max_takes(int pos, unsigned player, unsigned opponent);
 vector *max_takes(unsigned player, unsigned opponent);
+int do_max_takes(int *pos, unsigned *player, unsigned *opponent);
 
 #endif // UTILS_H
