@@ -71,17 +71,29 @@ int can_move_right(int pos, unsigned board, int direction) {
   return !(board & (1 << next_right(pos, direction)));
 }
 
-int can_move(int pos, unsigned player, unsigned opponent, int direction) {
-  return can_move_left(pos, player | opponent, direction) ||
-         can_move_right(pos, player | opponent, direction);
+int can_move(int pos, unsigned board, int direction) {
+  return can_move_left(pos, board, direction) ||
+         can_move_right(pos, board, direction);
 }
 
 vector *potential_moves(unsigned player, unsigned opponent, int direction) {
   vector *moves = vector_create();
   for (int pos = 0; pos < BOARD_SIZE * ROW_SIZE; pos++)
-    if (player & (1 << pos) && can_move(pos, player, opponent, direction))
+    if (player & (1 << pos) && can_move(pos, player | opponent, direction))
       vector_insert(moves, pos);
   return moves;
+}
+
+int do_move_left(int pos, unsigned *player, int direction) {
+  int new_pos = next_left(pos, direction);
+  *player ^= (1 << pos) | (1 << new_pos);
+  return new_pos;
+}
+
+int do_move_right(int pos, unsigned *player, int direction) {
+  int new_pos = next_right(pos, direction);
+  *player ^= (1 << pos) | (1 << new_pos);
+  return new_pos;
 }
 
 int can_take_left(int pos, unsigned player, unsigned opponent, int direction) {

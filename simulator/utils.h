@@ -13,8 +13,11 @@ int next_right(int pos, int direction);
 
 int can_move_left(int pos, unsigned board, int direction);
 int can_move_right(int pos, unsigned board, int direction);
-int can_move(int pos, unsigned player, unsigned opponent, int direction);
+int can_move(int pos, unsigned board, int direction);
 vector *potential_moves(unsigned player, unsigned opponent, int direction);
+
+int do_move_left(int pos, unsigned *player, int direction);
+int do_move_right(int pos, unsigned *player, int direction);
 
 int can_take_left(int pos, unsigned player, unsigned opponent, int direction);
 int can_take_right(int pos, unsigned player, unsigned opponent, int direction);
