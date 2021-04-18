@@ -7,7 +7,7 @@ void play_turn(unsigned *player, unsigned *opponent, int direction) {
   if (candidates->len > 0) {
     // TODO : choose i randomly
     int i = 0;
-    int pos = candidates->tab[i];
+    unsigned pos = candidates->tab[i];
     do_max_takes(&pos, player, opponent);
   } else {
     vector_delete(candidates);
@@ -15,7 +15,7 @@ void play_turn(unsigned *player, unsigned *opponent, int direction) {
     if (candidates->len > 0) {
       // TODO : choose i randomly
       int i = 0;
-      int pos = candidates->tab[i];
+      unsigned pos = candidates->tab[i];
       // /!\ PAS ALEATOIRE
       if (can_move_left(pos, *player | *opponent, direction))
         do_move_left(pos, player, direction);

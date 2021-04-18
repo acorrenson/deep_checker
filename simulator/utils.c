@@ -30,7 +30,7 @@ void print_board(unsigned player1, unsigned player2) {
   printf("+\n");
 }
 
-int next_left(int pos, int direction) {
+unsigned next_left(unsigned pos, int direction) {
   int odd_row = (pos / ROW_SIZE) & 1;
   if (direction == 0)
     pos += odd_row ? ROW_SIZE : ROW_SIZE + 1;
@@ -39,7 +39,7 @@ int next_left(int pos, int direction) {
   return pos;
 }
 
-int next_right(int pos, int direction) {
+unsigned next_right(unsigned pos, int direction) {
   int odd_row = (pos / ROW_SIZE) & 1;
   if (direction == 0)
     pos += odd_row ? ROW_SIZE - 1 : ROW_SIZE;
@@ -48,7 +48,7 @@ int next_right(int pos, int direction) {
   return pos;
 }
 
-int can_move_left(int pos, unsigned board, int direction) {
+int can_move_left(unsigned pos, unsigned board, int direction) {
   int row = pos / ROW_SIZE;
   int col = pos % ROW_SIZE;
   int odd_row = row & 1;
@@ -60,7 +60,7 @@ int can_move_left(int pos, unsigned board, int direction) {
   return !(board & (1 << next_left(pos, direction)));
 }
 
-int can_move_right(int pos, unsigned board, int direction) {
+int can_move_right(unsigned pos, unsigned board, int direction) {
   int row = pos / ROW_SIZE;
   int col = pos % ROW_SIZE;
   int odd_row = row & 1;
@@ -71,32 +71,33 @@ int can_move_right(int pos, unsigned board, int direction) {
   return !(board & (1 << next_right(pos, direction)));
 }
 
-int can_move(int pos, unsigned board, int direction) {
+int can_move(unsigned pos, unsigned board, int direction) {
   return can_move_left(pos, board, direction) ||
          can_move_right(pos, board, direction);
 }
 
 vector *potential_moves(unsigned player, unsigned opponent, int direction) {
   vector *moves = vector_create();
-  for (int pos = 0; pos < BOARD_SIZE * ROW_SIZE; pos++)
+  for (unsigned pos = 0; pos < BOARD_SIZE * ROW_SIZE; pos++)
     if (player & (1 << pos) && can_move(pos, player | opponent, direction))
       vector_insert(moves, pos);
   return moves;
 }
 
-int do_move_left(int pos, unsigned *player, int direction) {
-  int new_pos = next_left(pos, direction);
+unsigned do_move_left(unsigned pos, unsigned *player, int direction) {
+  unsigned new_pos = next_left(pos, direction);
   *player ^= (1 << pos) | (1 << new_pos);
   return new_pos;
 }
 
-int do_move_right(int pos, unsigned *player, int direction) {
-  int new_pos = next_right(pos, direction);
+unsigned do_move_right(unsigned pos, unsigned *player, int direction) {
+  unsigned new_pos = next_right(pos, direction);
   *player ^= (1 << pos) | (1 << new_pos);
   return new_pos;
 }
 
-int can_take_left(int pos, unsigned player, unsigned opponent, int direction) {
+int can_take_left(unsigned pos, unsigned player, unsigned opponent,
+                  int direction) {
   int row = pos / ROW_SIZE;
   int col = pos % ROW_SIZE;
   int odd_row = row & 1;
@@ -110,7 +111,8 @@ int can_take_left(int pos, unsigned player, unsigned opponent, int direction) {
          can_move_left(pos, player | opponent, direction);
 }
 
-int can_take_right(int pos, unsigned player, unsigned opponent, int direction) {
+int can_take_right(unsigned pos, unsigned player, unsigned opponent,
+                   int direction) {
   int row = pos / ROW_SIZE;
   int col = pos % ROW_SIZE;
   int odd_row = row & 1;
@@ -123,7 +125,7 @@ int can_take_right(int pos, unsigned player, unsigned opponent, int direction) {
          can_move_right(pos, player | opponent, direction);
 }
 
-int can_take(int pos, unsigned player, unsigned opponent) {
+int can_take(unsigned pos, unsigned player, unsigned opponent) {
   return can_take_left(pos, player, opponent, 0) ||
          can_take_left(pos, player, opponent, 1) ||
          can_take_right(pos, player, opponent, 0) ||
@@ -132,24 +134,25 @@ int can_take(int pos, unsigned player, unsigned opponent) {
 
 vector *potential_takes(unsigned player, unsigned opponent) {
   vector *takes = vector_create();
-  for (int pos = 0; pos < BOARD_SIZE * ROW_SIZE; pos++)
+  for (unsigned pos = 0; pos < BOARD_SIZE * ROW_SIZE; pos++)
     if (player & (1 << pos) && can_take(pos, player, opponent))
       vector_insert(takes, pos);
   return takes;
 }
 
-int do_take_left(int pos, unsigned *player, unsigned *opponent, int direction) {
-  int take = next_left(pos, direction);
-  int new_pos = next_left(take, direction);
+unsigned do_take_left(unsigned pos, unsigned *player, unsigned *opponent,
+                      int direction) {
+  unsigned take = next_left(pos, direction);
+  unsigned new_pos = next_left(take, direction);
   *player ^= (1 << pos) | (1 << new_pos);
   *opponent ^= (1 << take);
   return new_pos;
 }
 
-int do_take_right(int pos, unsigned *player, unsigned *opponent,
-                  int direction) {
-  int take = next_right(pos, direction);
-  int new_pos = next_right(take, direction);
+unsigned do_take_right(unsigned pos, unsigned *player, unsigned *opponent,
+                       int direction) {
+  unsigned take = next_right(pos, direction);
+  unsigned new_pos = next_right(take, direction);
   *player ^= (1 << pos) | (1 << new_pos);
   *opponent ^= (1 << take);
   return new_pos;
@@ -159,7 +162,7 @@ int max2(int a, int b) { return (a >= b ? a : b); }
 
 int max4(int a, int b, int c, int d) { return max2(max2(a, b), max2(c, d)); }
 
-int count_max_takes(int pos, unsigned player, unsigned opponent) {
+int count_max_takes(unsigned pos, unsigned player, unsigned opponent) {
   int count1 = 0;
   int count2 = 0;
   int count3 = 0;
@@ -208,15 +211,15 @@ vector *max_takes(unsigned player, unsigned opponent) {
   return max_takes;
 }
 
-int do_max_takes(int *pos, unsigned *player, unsigned *opponent) {
+int do_max_takes(unsigned *pos, unsigned *player, unsigned *opponent) {
   int count1 = 0;
   int count2 = 0;
   int count3 = 0;
   int count4 = 0;
-  int pos1 = *pos;
-  int pos2 = *pos;
-  int pos3 = *pos;
-  int pos4 = *pos;
+  unsigned pos1 = *pos;
+  unsigned pos2 = *pos;
+  unsigned pos3 = *pos;
+  unsigned pos4 = *pos;
   unsigned player1 = *player;
   unsigned player2 = *player;
   unsigned player3 = *player;
@@ -243,6 +246,7 @@ int do_max_takes(int *pos, unsigned *player, unsigned *opponent) {
     count4 = 1 + do_max_takes(&pos4, &player4, &opponent4);
   }
 
+  // /!\ PAS ALEATOIRE
   if (count1 > count2) {
     if (count3 > count4) {
       if (count1 > count3) {
