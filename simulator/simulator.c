@@ -34,9 +34,11 @@ void play_turn(unsigned *player, unsigned *opponent, int direction) {
   vector_delete(candidates);
 }
 
-void play_match(int show_board) {
+void play_match(vector *boards, int show_board) {
   unsigned player1 = 0b11111111111100000000000000000000;
   unsigned player2 = 0b00000000000000000000111111111111;
+  vector_insert(boards, player1);
+  vector_insert(boards, player2);
   int turn = 1;
   while (player1 && player2) {
     if (turn & 1)
@@ -45,12 +47,41 @@ void play_match(int show_board) {
       play_turn(&player2, &player1, 0);
     if (show_board)
       print_board(player1, player2);
+    vector_insert(boards, player1);
+    vector_insert(boards, player2);
     turn++;
   }
 }
 
-int main() {
+int main(int argc, char **argv) {
+  int runs = 1;
+  if (argc > 1)
+    runs = atoi(argv[1]);
+
   srand(time(NULL));
-  play_match(1);
+  vector *boards = vector_create();
+
+  for (int i = 0; i < runs; i++) {
+    play_match(boards, 0);
+  }
+
+  FILE *fd = fopen("boards.csv", "a");
+  if (fd == NULL) {
+    fprintf(stderr, "Invalid filename");
+    exit(1);
+  }
+  for (int i = 0; i < boards->len; i += 2) {
+    unsigned player1 = boards->tab[i];
+    unsigned player2 = boards->tab[i + 1];
+    fprintf(fd, "%x %x", player1, player2);
+    if (player1 && player2)
+      fprintf(fd, " ");
+    else
+      fprintf(fd, "\n");
+  }
+  fclose(fd);
+
+  vector_delete(boards);
+
   return 0;
 }
