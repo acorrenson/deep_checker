@@ -1,28 +1,29 @@
 #include "utils.h"
 #include "vector.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 void play_turn(unsigned *player, unsigned *opponent, int direction) {
   vector *candidates = max_takes(*player, *opponent);
   if (candidates->len > 0) {
-    // TODO : choose i randomly
-    int i = 0;
+    int i = rand() % candidates->len;
     unsigned pos = candidates->tab[i];
     do_max_takes(&pos, player, opponent);
   } else {
     vector_delete(candidates);
     candidates = potential_moves(*player, *opponent, direction);
     if (candidates->len > 0) {
-      // TODO : choose i randomly
-      int i = 0;
+      int i = rand() % candidates->len;
       unsigned pos = candidates->tab[i];
       // /!\ PAS ALEATOIRE
       if (can_move_left(pos, *player | *opponent, direction))
         do_move_left(pos, player, direction);
       else
         do_move_right(pos, player, direction);
-    } else
+    } else {
       *player = 0;
+    }
   }
   vector_delete(candidates);
 }
@@ -43,6 +44,7 @@ void play_match(int show_board) {
 }
 
 int main() {
+  srand(time(NULL));
   play_match(1);
   return 0;
 }
