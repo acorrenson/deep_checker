@@ -1,5 +1,6 @@
 #include "utils.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 void print_board(unsigned player1, unsigned player2) {
   for (int row = 0; row < BOARD_SIZE; row++) {
@@ -163,35 +164,32 @@ int max2(int a, int b) { return (a >= b ? a : b); }
 int max4(int a, int b, int c, int d) { return max2(max2(a, b), max2(c, d)); }
 
 int count_max_takes(unsigned pos, unsigned player, unsigned opponent) {
-  int count1 = 0;
-  int count2 = 0;
-  int count3 = 0;
-  int count4 = 0;
+  int count[4] = {0, 0, 0, 0};
   if (can_take_left(pos, player, opponent, 0)) {
     unsigned new_player = player;
     unsigned new_opponent = opponent;
     do_take_left(pos, &new_player, &new_opponent, 0);
-    count1 = 1 + count_max_takes(pos, new_player, new_opponent);
+    count[0] = 1 + count_max_takes(pos, new_player, new_opponent);
   }
   if (can_take_right(pos, player, opponent, 0)) {
     unsigned new_player = player;
     unsigned new_opponent = opponent;
     do_take_right(pos, &new_player, &new_opponent, 0);
-    count2 = 1 + count_max_takes(pos, new_player, new_opponent);
+    count[1] = 1 + count_max_takes(pos, new_player, new_opponent);
   }
   if (can_take_left(pos, player, opponent, 1)) {
     unsigned new_player = player;
     unsigned new_opponent = opponent;
     do_take_left(pos, &new_player, &new_opponent, 1);
-    count3 = 1 + count_max_takes(pos, new_player, new_opponent);
+    count[2] = 1 + count_max_takes(pos, new_player, new_opponent);
   }
   if (can_take_right(pos, player, opponent, 1)) {
     unsigned new_player = player;
     unsigned new_opponent = opponent;
     do_take_right(pos, &new_player, &new_opponent, 1);
-    count4 = 1 + count_max_takes(pos, new_player, new_opponent);
+    count[3] = 1 + count_max_takes(pos, new_player, new_opponent);
   }
-  return max4(count1, count2, count3, count4);
+  return max4(count[0], count[1], count[2], count[3]);
 }
 
 vector *max_takes(unsigned player, unsigned opponent) {
@@ -212,92 +210,39 @@ vector *max_takes(unsigned player, unsigned opponent) {
 }
 
 int do_max_takes(unsigned *pos, unsigned *player, unsigned *opponent) {
-  int count1 = 0;
-  int count2 = 0;
-  int count3 = 0;
-  int count4 = 0;
-  unsigned pos1 = *pos;
-  unsigned pos2 = *pos;
-  unsigned pos3 = *pos;
-  unsigned pos4 = *pos;
-  unsigned player1 = *player;
-  unsigned player2 = *player;
-  unsigned player3 = *player;
-  unsigned player4 = *player;
-  unsigned opponent1 = *opponent;
-  unsigned opponent2 = *opponent;
-  unsigned opponent3 = *opponent;
-  unsigned opponent4 = *opponent;
+  int count[4] = {0, 0, 0, 0};
+  unsigned pos_[4] = {*pos, *pos, *pos, *pos};
+  unsigned player_[4] = {*player, *player, *player, *player};
+  unsigned opponent_[4] = {*opponent, *opponent, *opponent, *opponent};
 
-  if (can_take_left(pos1, player1, opponent1, 0)) {
-    pos1 = do_take_left(pos1, &player1, &opponent1, 0);
-    count1 = 1 + do_max_takes(&pos1, &player1, &opponent1);
+  if (can_take_left(*pos, *player, *opponent, 0)) {
+    pos_[0] = do_take_left(*pos, player_, opponent_, 0);
+    count[0] = 1 + do_max_takes(pos_, player_, opponent_);
   }
-  if (can_take_right(pos2, player2, opponent3, 0)) {
-    pos2 = do_take_right(pos2, &player2, &opponent2, 0);
-    count2 = 1 + do_max_takes(&pos2, &player2, &opponent2);
+  if (can_take_right(*pos, *player, *opponent, 0)) {
+    pos_[1] = do_take_right(*pos, player_ + 1, opponent_ + 1, 0);
+    count[1] = 1 + do_max_takes(pos_ + 1, player_ + 1, opponent_ + 1);
   }
-  if (can_take_left(pos3, player3, opponent3, 1)) {
-    pos3 = do_take_left(pos3, &player3, &opponent3, 1);
-    count3 = 1 + do_max_takes(&pos3, &player3, &opponent3);
+  if (can_take_left(*pos, *player, *opponent, 1)) {
+    pos_[2] = do_take_left(*pos, player_ + 2, opponent_ + 2, 1);
+    count[2] = 1 + do_max_takes(pos_ + 2, player_ + 2, opponent_ + 2);
   }
-  if (can_take_right(pos4, player4, opponent4, 1)) {
-    pos4 = do_take_right(pos4, &player4, &opponent4, 1);
-    count4 = 1 + do_max_takes(&pos4, &player4, &opponent4);
+  if (can_take_right(*pos, *player, *opponent, 1)) {
+    pos_[3] = do_take_right(*pos, player_ + 3, opponent_ + 3, 1);
+    count[3] = 1 + do_max_takes(pos_ + 3, player_ + 3, opponent_ + 3);
   }
 
-  // /!\ PAS ALEATOIRE
-  if (count1 > count2) {
-    if (count3 > count4) {
-      if (count1 > count3) {
-        *pos = pos1;
-        *player = player1;
-        *opponent = opponent1;
-        return count1;
-      } else {
-        *pos = pos3;
-        *player = player3;
-        *opponent = opponent3;
-        return count3;
-      }
-    } else {
-      if (count1 > count4) {
-        *pos = pos1;
-        *player = player1;
-        *opponent = opponent1;
-        return count1;
-      } else {
-        *pos = pos4;
-        *player = player4;
-        *opponent = opponent4;
-        return count4;
-      }
-    }
-  } else {
-    if (count3 > count4) {
-      if (count2 > count3) {
-        *pos = pos2;
-        *player = player2;
-        *opponent = opponent2;
-        return count2;
-      } else {
-        *pos = pos3;
-        *player = player3;
-        *opponent = opponent3;
-        return count3;
-      }
-    } else {
-      if (count2 > count4) {
-        *pos = pos2;
-        *player = player2;
-        *opponent = opponent2;
-        return count2;
-      } else {
-        *pos = pos4;
-        *player = player4;
-        *opponent = opponent4;
-        return count4;
-      }
-    }
-  }
+  int max_count = max4(count[0], count[1], count[2], count[3]);
+  vector *take_choice = vector_create();
+  for (int i = 0; i < 4; i++)
+    if (count[i] == max_count)
+      vector_insert(take_choice, i);
+  int i = rand() % take_choice->len;
+  int j = take_choice->tab[i];
+  *pos = pos_[j];
+  *player = player_[j];
+  *opponent = opponent_[j];
+  vector_delete(take_choice);
+
+  return max_count;
 }

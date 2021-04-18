@@ -16,11 +16,17 @@ void play_turn(unsigned *player, unsigned *opponent, int direction) {
     if (candidates->len > 0) {
       int i = rand() % candidates->len;
       unsigned pos = candidates->tab[i];
-      // /!\ PAS ALEATOIRE
+      vector *move_choice = vector_create();
       if (can_move_left(pos, *player | *opponent, direction))
+        vector_insert(move_choice, 0);
+      if (can_move_right(pos, *player | *opponent, direction))
+        vector_insert(move_choice, 1);
+      int j = rand() % move_choice->len;
+      if (move_choice->tab[j] == 0)
         do_move_left(pos, player, direction);
       else
         do_move_right(pos, player, direction);
+      vector_delete(move_choice);
     } else {
       *player = 0;
     }
