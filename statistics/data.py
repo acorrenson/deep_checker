@@ -12,5 +12,8 @@ with open("example.csv") as fichier :
         data.append(liste_couples)
 
 
-    
+def distance_coups(coup1, coup2) :
+    return bin(coup1^coup2).count('1')
+
+
 # Here read the data
