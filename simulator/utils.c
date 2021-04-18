@@ -55,7 +55,7 @@ int can_move_left(unsigned pos, unsigned board, int direction) {
   if (direction == 0 &&
       (row == BOARD_SIZE - 1 || (!odd_row && col == ROW_SIZE - 1)))
     return 0;
-  else if (row == 0 || (odd_row && col == 0))
+  else if (direction == 1 && (row == 0 || (odd_row && col == 0)))
     return 0;
   return !((board >> next_left(pos, direction)) & 1);
 }
@@ -66,7 +66,7 @@ int can_move_right(unsigned pos, unsigned board, int direction) {
   int odd_row = row & 1;
   if (direction == 0 && (row == BOARD_SIZE - 1 || (odd_row && col == 0)))
     return 0;
-  else if (row == 0 || (!odd_row && col == ROW_SIZE - 1))
+  else if (direction == 1 && (row == 0 || (!odd_row && col == ROW_SIZE - 1)))
     return 0;
   return !((board >> next_right(pos, direction)) & 1);
 }
@@ -104,7 +104,7 @@ int can_take_left(unsigned pos, unsigned player, unsigned opponent,
   if (direction == 0 &&
       (row == BOARD_SIZE - 1 || (!odd_row && col == ROW_SIZE - 1)))
     return 0;
-  else if (row == 0 || (odd_row && col == 0))
+  else if (direction == 1 && (row == 0 || (odd_row && col == 0)))
     return 0;
   pos = next_left(pos, direction);
   return ((opponent >> pos) & 1) &&
@@ -118,7 +118,7 @@ int can_take_right(unsigned pos, unsigned player, unsigned opponent,
   int odd_row = row & 1;
   if (direction == 0 && (row == BOARD_SIZE - 1 || (odd_row && col == 0)))
     return 0;
-  else if (row == 0 || (!odd_row && col == ROW_SIZE - 1))
+  else if (direction == 1 && (row == 0 || (!odd_row && col == ROW_SIZE - 1)))
     return 0;
   pos = next_right(pos, direction);
   return ((opponent >> pos) & 1) &&
