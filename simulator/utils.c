@@ -24,53 +24,76 @@ void print_board(unsigned player1, unsigned player2) {
     }
     printf("|\n");
   }
+
   for (int col = 0; col < BOARD_SIZE; col++)
     printf("+---");
   printf("+\n");
 }
 
+int next_left(int pos, int direction) {
+  int odd_row = (pos / ROW_SIZE) & 1;
+  if (direction == 0)
+    pos += odd_row ? ROW_SIZE : ROW_SIZE + 1;
+  else
+    pos -= odd_row ? ROW_SIZE + 1 : ROW_SIZE;
+  return pos;
+}
+
+int next_right(int pos, int direction) {
+  int odd_row = (pos / ROW_SIZE) & 1;
+  if (direction == 0)
+    pos += odd_row ? ROW_SIZE - 1 : ROW_SIZE;
+  else
+    pos -= odd_row ? ROW_SIZE : ROW_SIZE - 1;
+  return pos;
+}
+
 int can_move_left(int pos, unsigned board, int direction) {
   int row = pos / ROW_SIZE;
   int col = pos % ROW_SIZE;
-  if (direction == 0) {
-    if (row == BOARD_SIZE - 1 || (row % 2 == 0 && col == ROW_SIZE - 1))
-      return 0;
-    pos += (row % 2 == 0) ? ROW_SIZE + 1 : ROW_SIZE;
-  } else {
-    if (row == 0 || (row % 2 == 1 && col == 0))
-      return 0;
-    pos -= (row % 2 == 0) ? ROW_SIZE : ROW_SIZE + 1;
-  }
-  return !(board & (1 << pos));
+  int odd_row = row & 1;
+  if (direction == 0 &&
+      (row == BOARD_SIZE - 1 || (!odd_row && col == ROW_SIZE - 1)))
+    return 0;
+  else if (row == 0 || (odd_row && col == 0))
+    return 0;
+  return !(board & (1 << next_left(pos, direction)));
 }
 
 int can_move_right(int pos, unsigned board, int direction) {
   int row = pos / ROW_SIZE;
   int col = pos % ROW_SIZE;
-  if (direction == 0) {
-    if (row == BOARD_SIZE - 1 || (row % 2 == 1 && col == 0))
-      return 0;
-    pos += (row % 2 == 0) ? ROW_SIZE : ROW_SIZE - 1;
-  } else {
-    if (row == 0 || (row % 2 == 0 && col == ROW_SIZE - 1))
-      return 0;
-    pos -= (row % 2 == 0) ? ROW_SIZE - 1 : ROW_SIZE;
-  }
-  return !(board & (1 << pos));
+  int odd_row = row & 1;
+  if (direction == 0 && (row == BOARD_SIZE - 1 || (odd_row && col == 0)))
+    return 0;
+  else if (row == 0 || (!odd_row && col == ROW_SIZE - 1))
+    return 0;
+  return !(board & (1 << next_right(pos, direction)));
+}
+
+int can_move(int pos, unsigned player, unsigned opponent, int direction) {
+  return can_move_left(pos, player | opponent, direction) ||
+         can_move_right(pos, player | opponent, direction);
+}
+
+vector *potential_moves(unsigned player, unsigned opponent, int direction) {
+  vector *moves = vector_create();
+  for (int pos = 0; pos < BOARD_SIZE * ROW_SIZE; pos++)
+    if (player & (1 << pos) && can_move(pos, player, opponent, direction))
+      vector_insert(moves, pos);
+  return moves;
 }
 
 int can_take_left(int pos, unsigned player, unsigned opponent, int direction) {
   int row = pos / ROW_SIZE;
   int col = pos % ROW_SIZE;
-  if (direction == 0) {
-    if (row == BOARD_SIZE - 1 || (row % 2 == 0 && col == ROW_SIZE - 1))
-      return 0;
-    pos += (row % 2 == 0) ? ROW_SIZE + 1 : ROW_SIZE;
-  } else {
-    if (row == 0 || (row % 2 == 1 && col == 0))
-      return 0;
-    pos -= (row % 2 == 0) ? ROW_SIZE : ROW_SIZE + 1;
-  }
+  int odd_row = row & 1;
+  if (direction == 0 &&
+      (row == BOARD_SIZE - 1 || (!odd_row && col == ROW_SIZE - 1)))
+    return 0;
+  else if (row == 0 || (odd_row && col == 0))
+    return 0;
+  pos = next_left(pos, direction);
   return (opponent & (1 << pos)) &&
          can_move_left(pos, player | opponent, direction);
 }
@@ -78,15 +101,12 @@ int can_take_left(int pos, unsigned player, unsigned opponent, int direction) {
 int can_take_right(int pos, unsigned player, unsigned opponent, int direction) {
   int row = pos / ROW_SIZE;
   int col = pos % ROW_SIZE;
-  if (direction == 0) {
-    if (row == BOARD_SIZE - 1 || (row % 2 == 1 && col == 0))
-      return 0;
-    pos += (row % 2 == 0) ? ROW_SIZE : ROW_SIZE - 1;
-  } else {
-    if (row == 0 || (row % 2 == 0 && col == ROW_SIZE - 1))
-      return 0;
-    pos -= (row % 2 == 0) ? ROW_SIZE - 1 : ROW_SIZE;
-  }
+  int odd_row = row & 1;
+  if (direction == 0 && (row == BOARD_SIZE - 1 || (odd_row && col == 0)))
+    return 0;
+  else if (row == 0 || (!odd_row && col == ROW_SIZE - 1))
+    return 0;
+  pos = next_right(pos, direction);
   return (opponent & (1 << pos)) &&
          can_move_right(pos, player | opponent, direction);
 }
@@ -98,11 +118,6 @@ int can_take(int pos, unsigned player, unsigned opponent) {
          can_take_right(pos, player, opponent, 1);
 }
 
-int can_move(int pos, unsigned player, unsigned opponent, int direction) {
-  return can_move_left(pos, player | opponent, direction) ||
-         can_move_right(pos, player | opponent, direction);
-}
-
 vector *potential_takes(unsigned player, unsigned opponent) {
   vector *takes = vector_create();
   for (int pos = 0; pos < BOARD_SIZE * ROW_SIZE; pos++)
@@ -111,41 +126,19 @@ vector *potential_takes(unsigned player, unsigned opponent) {
   return takes;
 }
 
-vector *potential_moves(unsigned player, unsigned opponent, int direction) {
-  vector *moves = vector_create();
-  for (int pos = 0; pos < BOARD_SIZE * ROW_SIZE; pos++)
-    if (player & (1 << pos) && can_move(pos, player, opponent, direction))
-      vector_insert(moves, pos);
-  return moves;
-}
-
-int next_left(int pos, int dir) {
-  if ((pos / ROW_SIZE) & 1)
-    return pos + (dir ? -5 : 4);
-  return pos + (dir ? -4 : 4);
-}
-
-int next_right(int pos, int dir) {
-  if ((pos / ROW_SIZE) & 1)
-    return pos + (dir ? -4 : 4);
-  return pos + (dir ? -3 : 5);
-}
-
-int do_take_left(int pos, unsigned *p1, unsigned *p2, int dir) {
-  int kill = next_left(pos, dir);
-  int new_pos = next_left(kill, dir);
-  *p1 ^= (1 << pos);
-  *p1 |= (1 << new_pos);
-  *p2 ^= (1 << kill);
+int do_take_left(int pos, unsigned *p1, unsigned *p2, int direction) {
+  int take = next_left(pos, direction);
+  int new_pos = next_left(take, direction);
+  *p1 ^= (1 << pos) | (1 << new_pos);
+  *p2 ^= (1 << take);
   return new_pos;
 }
 
-int do_take_right(int pos, unsigned *p1, unsigned *p2, int dir) {
-  int kill = next_right(pos, dir);
-  int new_pos = next_right(kill, dir);
-  *p1 ^= (1 << pos);
-  *p1 |= (1 << new_pos);
-  *p2 ^= (1 << kill);
+int do_take_right(int pos, unsigned *p1, unsigned *p2, int direction) {
+  int take = next_right(pos, direction);
+  int new_pos = next_right(take, direction);
+  *p1 ^= (1 << pos) | (1 << new_pos);
+  *p2 ^= (1 << take);
   return new_pos;
 }
 
