@@ -57,7 +57,7 @@ int can_move_left(unsigned pos, unsigned board, int direction) {
     return 0;
   else if (row == 0 || (odd_row && col == 0))
     return 0;
-  return !(board & (1 << next_left(pos, direction)));
+  return !((board >> next_left(pos, direction)) & 1);
 }
 
 int can_move_right(unsigned pos, unsigned board, int direction) {
@@ -68,7 +68,7 @@ int can_move_right(unsigned pos, unsigned board, int direction) {
     return 0;
   else if (row == 0 || (!odd_row && col == ROW_SIZE - 1))
     return 0;
-  return !(board & (1 << next_right(pos, direction)));
+  return !((board >> next_right(pos, direction)) & 1);
 }
 
 int can_move(unsigned pos, unsigned board, int direction) {
@@ -79,7 +79,7 @@ int can_move(unsigned pos, unsigned board, int direction) {
 vector *potential_moves(unsigned player, unsigned opponent, int direction) {
   vector *moves = vector_create();
   for (unsigned pos = 0; pos < BOARD_SIZE * ROW_SIZE; pos++)
-    if (player & (1 << pos) && can_move(pos, player | opponent, direction))
+    if (((player >> pos) & 1) && can_move(pos, player | opponent, direction))
       vector_insert(moves, pos);
   return moves;
 }
@@ -107,7 +107,7 @@ int can_take_left(unsigned pos, unsigned player, unsigned opponent,
   else if (row == 0 || (odd_row && col == 0))
     return 0;
   pos = next_left(pos, direction);
-  return (opponent & (1 << pos)) &&
+  return ((opponent >> pos) & 1) &&
          can_move_left(pos, player | opponent, direction);
 }
 
@@ -121,7 +121,7 @@ int can_take_right(unsigned pos, unsigned player, unsigned opponent,
   else if (row == 0 || (!odd_row && col == ROW_SIZE - 1))
     return 0;
   pos = next_right(pos, direction);
-  return (opponent & (1 << pos)) &&
+  return ((opponent >> pos) & 1) &&
          can_move_right(pos, player | opponent, direction);
 }
 
@@ -135,7 +135,7 @@ int can_take(unsigned pos, unsigned player, unsigned opponent) {
 vector *potential_takes(unsigned player, unsigned opponent) {
   vector *takes = vector_create();
   for (unsigned pos = 0; pos < BOARD_SIZE * ROW_SIZE; pos++)
-    if (player & (1 << pos) && can_take(pos, player, opponent))
+    if (((player >> pos) & 1) && can_take(pos, player, opponent))
       vector_insert(takes, pos);
   return takes;
 }
