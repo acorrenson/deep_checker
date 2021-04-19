@@ -1,6 +1,5 @@
-import pandas
 import numpy as np
-
+from sklearn import neighbors
 
 data = []
 
@@ -62,7 +61,42 @@ def get_labels(games):
     return labels
 
 
-labels = get_labels(data)
-for k in labels:
-    print(
-        f'score({hex(k[0][0])}, {hex(k[0][1])}, {hex(k[1][0])}, {hex(k[1][1])}) : {sum(labels[k])/len(labels[k])}')
+def vectorize_state(state):
+    vec = np.zeros(64, dtype=np.uint8)
+    player = state[0]
+    opponent = state[1]
+    for i in range(32):
+        vec[i] = player & 1
+        vec[32 + i] = opponent & 1
+        player >>= 1
+        opponent >>= 1
+    return vec
+
+
+def vectorize_move(move):
+    A = vectorize_state(move[0])
+    B = vectorize_state(move[1])
+    return np.concatenate([A, B])
+
+
+def vectorize_labels(labs):
+    X = np.zeros((len(labs), 128), dtype=np.uint8)
+    y = np.zeros((len(labs), 1), dtype=np.float32)
+    for i, (move, score) in enumerate(labs.items()):
+        X[i, :] = vectorize_move(move)
+        y[i, :] = sum(score)/len(score)
+    return X, y
+
+
+def vectorial_distance(x1, x2):
+    return np.logical_xor(x1, x2).sum()
+
+
+labels = get_labels(data[:100])
+X, y = vectorize_labels(labels)
+
+move = get_player_moves(data[0], 0)[0]
+
+knn = neighbors.KNeighborsRegressor(4, metric=vectorial_distance)
+y_ = knn.fit(X, y).predict(np.array([vectorize_move(move)]))
+print(y_)
