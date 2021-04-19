@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn import neighbors
+import pickle
 
 data = []
 
@@ -98,5 +99,7 @@ X, y = vectorize_labels(labels)
 move = get_player_moves(data[0], 0)[0]
 
 knn = neighbors.KNeighborsRegressor(4, metric=vectorial_distance)
-y_ = knn.fit(X, y).predict(np.array([vectorize_move(move)]))
-print(y_)
+model = knn.fit(X, y)
+
+with open('model.save', 'wb') as f:
+    pickle.dump(move, f)
