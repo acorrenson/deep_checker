@@ -11,7 +11,11 @@ int main(int argc, char **argv) {
   srand(time(NULL));
   vector *boards = vector_create();
 
-  play_match(play_random, play_random, boards, 1);
+  // unsigned player1 = 0b11111111111100000000000000000000;
+  // unsigned player2 = 0b00000000000000000000111111111111;
+  // ask_knn(potential_moves(player1, player2, 1));
+
+  play_match(play_random, play_knn, boards, 1);
 
   if (boards->tab[boards->len - 2])
     printf("Player 1 wins!\n");
