@@ -35,45 +35,39 @@ void play_random(unsigned *player, unsigned *opponent, int direction) {
   vector_delete(candidates);
 }
 
-// vector *generate_takes(vector *candidates, unsigned player, unsigned
-// opponent) {
-//   vector *moves = vector_create();
-//   unsigned player_next;
-//   unsigned opponent_next;
-//   for (int i = 0; i < candidates->len; i++) {
-//     player_next = player;
-//     opponent_next = opponent;
-//     unsigned pos = candidates->tab[i];
-//     do_take_left(&pos, &player_next, &opponent_next);
-//     vector_insert(moves, player);
-//     vector_insert(moves, opponent);
-//     vector_insert(moves, player_next);
-//     vector_insert(moves, opponent_next);
-//   }
-//   return moves;
-// }
-
-vector *generate_moves(vector *candidates, unsigned player, unsigned opponent,
-                       int dir) {
+vector *generate_takes(vector *candidates, unsigned player, unsigned opponent) {
   vector *moves = vector_create();
   unsigned player_next;
   unsigned opponent_next;
+  vector_insert(moves, player);
+  vector_insert(moves, opponent);
   for (int i = 0; i < candidates->len; i++) {
-    if (can_move_left(candidates->tab[i], player | opponent, dir)) {
+    unsigned pos = candidates->tab[i];
+    if (can_take_left(pos, player, opponent, 0)) {
       player_next = player;
       opponent_next = opponent;
-      do_move_left(candidates->tab[i], &player_next, dir);
-      vector_insert(moves, player);
-      vector_insert(moves, opponent);
+      do_take_left(pos, &player_next, &opponent_next, 0);
       vector_insert(moves, player_next);
       vector_insert(moves, opponent_next);
     }
-    if (can_move_right(candidates->tab[i], player | opponent, dir)) {
+    if (can_take_right(pos, player, opponent, 0)) {
       player_next = player;
       opponent_next = opponent;
-      do_move_right(candidates->tab[i], &player_next, dir);
-      vector_insert(moves, player);
-      vector_insert(moves, opponent);
+      do_take_right(pos, &player_next, &opponent_next, 0);
+      vector_insert(moves, player_next);
+      vector_insert(moves, opponent_next);
+    }
+    if (can_take_left(pos, player, opponent, 1)) {
+      player_next = player;
+      opponent_next = opponent;
+      do_take_left(pos, &player_next, &opponent_next, 1);
+      vector_insert(moves, player_next);
+      vector_insert(moves, opponent_next);
+    }
+    if (can_take_right(pos, player, opponent, 1)) {
+      player_next = player;
+      opponent_next = opponent;
+      do_take_left(pos, &player_next, &opponent_next, 1);
       vector_insert(moves, player_next);
       vector_insert(moves, opponent_next);
     }
@@ -81,24 +75,51 @@ vector *generate_moves(vector *candidates, unsigned player, unsigned opponent,
   return moves;
 }
 
-unsigned ask_knn(vector *candidates) {
+vector *generate_moves(vector *candidates, unsigned player, unsigned opponent,
+                       int dir) {
+  vector *moves = vector_create();
+  unsigned player_next;
+  unsigned opponent_next;
+  vector_insert(moves, player);
+  vector_insert(moves, opponent);
+  for (int i = 0; i < candidates->len; i++) {
+    if (can_move_left(candidates->tab[i], player | opponent, dir)) {
+      player_next = player;
+      opponent_next = opponent;
+      do_move_left(candidates->tab[i], &player_next, dir);
+      vector_insert(moves, player_next);
+      vector_insert(moves, opponent_next);
+    }
+    if (can_move_right(candidates->tab[i], player | opponent, dir)) {
+      player_next = player;
+      opponent_next = opponent;
+      do_move_right(candidates->tab[i], &player_next, dir);
+      vector_insert(moves, player_next);
+      vector_insert(moves, opponent_next);
+    }
+  }
+  return moves;
+}
+
+unsigned ask_knn(vector *moves) {
   // building command line
-  char *cmd = "./data.py";
+  char *cmd = "knn.py";
   size_t cmd_len = strlen(cmd);
-  size_t buff_size = cmd_len + candidates->len * 9 * 4;
+  size_t buff_size = cmd_len + moves->len * 9 * 4;
   char *args = malloc(buff_size + 1);
   memcpy(args, cmd, cmd_len);
   args[cmd_len] = ' ';
 
+  unsigned player = moves->tab[0];
+  unsigned opponent = moves->tab[1];
+
   // adding args
   char *pos = args + cmd_len + 1;
-  for (int i = 0; i < candidates->len; i += 4) {
-    printf("candidate : %x %x -> %x %x\n", candidates->tab[i],
-           candidates->tab[i + 1], candidates->tab[i + 2],
-           candidates->tab[i + 3]);
-    pos +=
-        sprintf(pos, "%x %x %x %x ", candidates->tab[i], candidates->tab[i + 1],
-                candidates->tab[i + 2], candidates->tab[i + 3]);
+  for (int i = 2; i < moves->len; i += 2) {
+    printf("candidate : %x %x -> %x %x\n", player, opponent, moves->tab[i],
+           moves->tab[i + 1]);
+    pos += sprintf(pos, "%x %x %x %x ", player, opponent, moves->tab[i],
+                   moves->tab[i + 1]);
   }
 
   // executing the command
@@ -109,7 +130,10 @@ unsigned ask_knn(vector *candidates) {
 
 void play_knn(unsigned *player, unsigned *opponent, int direction) {
   vector *candidates = max_takes(*player, *opponent);
+  vector *takes = generate_takes(candidates, *player, *opponent);
   if (candidates->len > 0) {
+    ask_knn(takes);
+    vector_delete(takes);
     unsigned pos = candidates->tab[0];
     if (candidates->len > 1)
       // TODO : choose with KNN
@@ -121,6 +145,7 @@ void play_knn(unsigned *player, unsigned *opponent, int direction) {
     vector *moves = generate_moves(candidates, *player, *opponent, direction);
     if (candidates->len > 0) {
       ask_knn(moves);
+      vector_delete(moves);
       unsigned pos = candidates->tab[0];
       if (candidates->len > 1)
         // TODO : choose with KNN
