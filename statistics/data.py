@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn import neighbors
-import pickle
+import joblib
 
 data = []
 
@@ -9,46 +9,46 @@ with open("boards.csv") as fichier:
         coups = game.split()
         liste_couples = []
         for i in range(0, len(coups) - 1, 2):
-            couple = (int(coups[i], 16), int(coups[i+1], 16))
+            couple = (int(coups[i], 16), int(coups[i + 1], 16))
             liste_couples.append(couple)
         data.append(liste_couples)
 
 
 def move_distance(move1, move2):
     """
-        Compute a distance btw 2 moves (edition distance)
+    Compute a distance between 2 moves (edition distance)
     """
-    return bin(move1 ^ move2).count('1')
+    return bin(move1 ^ move2).count("1")
 
 
 def get_winner(game):
     """
-        Returns the winner of the game (0 or 1)
+    Returns the winner of the game (0 or 1)
     """
     return 1 - (len(game) % 2)
 
 
 def get_player_moves(game, player):
     """
-        Returns the sequence of moves of the given player
+    Returns the sequence of moves of the given player
     """
     moves = []
-    for i in range(player, len(game)-1, 2):
-        moves.append((game[i], game[i+1]))
+    for i in range(player, len(game) - 1, 2):
+        moves.append((game[i], game[i + 1]))
     return moves
 
 
 def heuristic1(moves, i, win):
-    return (1 if win else -1)/np.sqrt(len(moves) - i)
+    return (1 if win else -1) / np.sqrt(len(moves) - i)
 
 
 def heuristic2(moves, i, win):
-    return (1 if win else -1)/(len(moves) - i)
+    return (1 if win else -1) / (len(moves) - i)
 
 
 def get_labels(games):
     """
-        Associates scores to moves
+    Associates scores to moves
     """
     labels = dict()
     for game in games:
@@ -85,7 +85,7 @@ def vectorize_labels(labs):
     y = np.zeros((len(labs), 1), dtype=np.float32)
     for i, (move, score) in enumerate(labs.items()):
         X[i, :] = vectorize_move(move)
-        y[i, :] = sum(score)/len(score)
+        y[i, :] = sum(score) / len(score)
     return X, y
 
 
@@ -99,7 +99,6 @@ X, y = vectorize_labels(labels)
 move = get_player_moves(data[0], 0)[0]
 
 knn = neighbors.KNeighborsRegressor(4, metric=vectorial_distance)
-model = knn.fit(X, y)
+knn_model = knn.fit(X, y)
 
-with open('model.save', 'wb') as f:
-    pickle.dump(move, f)
+joblib.dump(knn_model, "knn.save")
