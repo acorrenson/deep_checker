@@ -98,7 +98,7 @@ X, y = vectorize_labels(labels)
 
 move = get_player_moves(data[0], 0)[0]
 
-knn = neighbors.KNeighborsRegressor(4, metric=vectorial_distance)
+knn = neighbors.KNeighborsRegressor(8, metric=vectorial_distance)
 knn_model = knn.fit(X, y)
 
 joblib.dump(knn_model, "knn.save")
