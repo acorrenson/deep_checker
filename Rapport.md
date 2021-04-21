@@ -34,14 +34,20 @@ Cet algorithme de machine learning est une algorithme d'apprentissage supervisé
 
 #### Adaptation de KNN à notre heuristique
 
-Dans une situation de plateau donnée, on attribue un score à chaque coups possible avec l'aide de KNN :
+Dans une situation de plateau donnée, l'heuristique calcule le coups suivant à faire de la manière suivante :
 
-+ choix de la distance : Nombre de bytes dans un Xor entre deux coups.
-+ choix de K = 4 
-+ La valeur associée aux K plus proches voisins correspond à la moyenne des scores.
+On commence par déterminer les coups possibles à faire. Ensuite, pour chacun de ces coups, nous calculons un score associé à chaque coup, déterminé avec l'algorithme KNN de la manière suivante :
+
++ Les coups sont représenté sous forme de suite de bite. Pour calculer la distance entre deux coups, on calcule le nombre de bite différents entre les deux coups (On fait un XOR entre les deux coups, et on compte le nombre de 1)
+
+$ Score(coup1, coup2) = somme(coup1 \xor coup2)$ 
+
++ Nous avons choisi une valeur de K = 4 de manière arbitraire. Ce choix peut être sujet à discussion. 
+
++ Le score donné au coup d'entrée correspond alors à la moyenne des scores des K plus proches voisins. 
+
 
 Enfin, on sélectionne le coups possible ayant le plus grand score. 
-
 
 ## Conclusion
 
