@@ -54,7 +54,7 @@ vector *generate_takes(vector *player_choice, vector *opponent_choice,
 
 unsigned ask_knn(vector *moves) {
   // building command line
-  char *cmd = "knn.py";
+  char *cmd = "python3 knn.py";
   size_t cmd_len = strlen(cmd);
   size_t buff_size = cmd_len + moves->len * 9 * 4;
   char *args = malloc(buff_size + 1);
@@ -63,21 +63,32 @@ unsigned ask_knn(vector *moves) {
 
   unsigned player = moves->tab[0];
   unsigned opponent = moves->tab[1];
+  unsigned player_next;
+  unsigned opponent_next;
 
   // adding args
   char *pos = args + cmd_len + 1;
+  pos += sprintf(pos, "%x %x ", player, opponent);
   for (int i = 2; i < moves->len; i += 2) {
-    printf("candidate : %x %x -> %x %x\n", player, opponent, moves->tab[i],
-           moves->tab[i + 1]);
-    pos += sprintf(pos, "%x %x %x %x ", player, opponent, moves->tab[i],
-                   moves->tab[i + 1]);
+    player_next = moves->tab[i];
+    opponent_next = moves->tab[i + 1];
+    pos += sprintf(pos, "%x %x ", moves->tab[i], moves->tab[i + 1]);
   }
-
-  // executing the command
   *pos = '\0';
   printf("cmd : %s\n", args);
-  // TODO : really choose with knn
-  return 0;
+
+  // executing the command
+  FILE *fd = popen(args, "r");
+  if (fd == NULL) {
+    fprintf(stderr, "Invalid command");
+    exit(1);
+  }
+  int i = 0;
+  fscanf(fd, "%d", &i);
+  printf("returned %d\n", i);
+  pclose(fd);
+
+  return i;
 }
 
 void play_knn(unsigned *player, unsigned *opponent, int direction) {
