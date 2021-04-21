@@ -17,6 +17,6 @@ target_link_libraries(simulator game)
 add_executable(interactive interactive.c)
 target_link_libraries(interactive game)
 
-file(COPY ../statistics/data.py DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY ../statistics/utils.py DESTINATION ${CMAKE_BINARY_DIR})
 file(COPY ../statistics/knn.py DESTINATION ${CMAKE_BINARY_DIR})
 file(COPY ../statistics/knn.save DESTINATION ${CMAKE_BINARY_DIR})
