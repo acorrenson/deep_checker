@@ -7,26 +7,36 @@
 
 void play_random(unsigned *player, unsigned *opponent, int direction) {
   vector *player_choice = vector_create();
-  vector_insert(player_choice, *player);
-  vector *opponent_choice = vector_create();
-  vector_insert(opponent_choice, *opponent);
   vector *candidates = potential_max_takes(*player, *opponent);
   if (candidates->len > 0) {
+    // if we can take
     int i = rand() % candidates->len;
     unsigned pos = candidates->tab[i];
     do_max_takes(&pos, player, opponent);
   } else {
-    move_choices(player_choice, *opponent, direction);
-    if (player_choice->len > 1) {
-      int i = 1 + (rand() % (player_choice->len - 1));
+    move_choices(player_choice, *player, *opponent, direction);
+    if (player_choice->len > 0) {
+      // if we can move
+      int i = rand() % player_choice->len;
       *player = player_choice->tab[i];
     } else {
       *player = 0;
     }
   }
-  vector_delete(candidates);
   vector_delete(player_choice);
-  vector_delete(opponent_choice);
+  vector_delete(candidates);
+}
+
+vector *generate_moves(vector *player_choice, unsigned player,
+                       unsigned opponent, int direction) {
+  vector *moves = vector_create();
+  vector_insert(moves, player);
+  vector_insert(moves, opponent);
+  for (int i = 0; i < player_choice->len; i++) {
+    vector_insert(moves, player_choice->tab[i]);
+    vector_insert(moves, opponent);
+  }
+  return moves;
 }
 
 vector *generate_takes(vector *candidates, unsigned player, unsigned opponent) {
@@ -69,32 +79,6 @@ vector *generate_takes(vector *candidates, unsigned player, unsigned opponent) {
   return moves;
 }
 
-vector *generate_moves(vector *candidates, unsigned player, unsigned opponent,
-                       int dir) {
-  vector *moves = vector_create();
-  unsigned player_next;
-  unsigned opponent_next;
-  vector_insert(moves, player);
-  vector_insert(moves, opponent);
-  for (int i = 0; i < candidates->len; i++) {
-    if (can_move_left(candidates->tab[i], player | opponent, dir)) {
-      player_next = player;
-      opponent_next = opponent;
-      do_move_left(candidates->tab[i], &player_next, dir);
-      vector_insert(moves, player_next);
-      vector_insert(moves, opponent_next);
-    }
-    if (can_move_right(candidates->tab[i], player | opponent, dir)) {
-      player_next = player;
-      opponent_next = opponent;
-      do_move_right(candidates->tab[i], &player_next, dir);
-      vector_insert(moves, player_next);
-      vector_insert(moves, opponent_next);
-    }
-  }
-  return moves;
-}
-
 unsigned ask_knn(vector *moves) {
   // building command line
   char *cmd = "knn.py";
@@ -119,48 +103,40 @@ unsigned ask_knn(vector *moves) {
   // executing the command
   *pos = '\0';
   printf("cmd : %s\n", args);
+  // TODO : really choose with knn
   return 0;
 }
 
 void play_knn(unsigned *player, unsigned *opponent, int direction) {
+  vector *player_choice = vector_create();
+  vector *opponent_choice = vector_create();
   vector *candidates = potential_max_takes(*player, *opponent);
   vector *takes = generate_takes(candidates, *player, *opponent);
   if (candidates->len > 0) {
+    // if we can take
     ask_knn(takes);
-    vector_delete(takes);
     unsigned pos = candidates->tab[0];
     if (candidates->len > 1)
       // TODO : choose with KNN
       pos = candidates->tab[0];
     do_max_takes(&pos, player, opponent);
   } else {
-    vector_delete(candidates);
-    candidates = potential_moves(*player, *opponent, direction);
-    vector *moves = generate_moves(candidates, *player, *opponent, direction);
-    if (candidates->len > 0) {
-      ask_knn(moves);
+    move_choices(player_choice, *player, *opponent, direction);
+    if (player_choice->len > 0) {
+      // if we can move
+      vector *moves =
+          generate_moves(player_choice, *player, *opponent, direction);
+      int i = ask_knn(moves);
       vector_delete(moves);
-      unsigned pos = candidates->tab[0];
-      if (candidates->len > 1)
-        // TODO : choose with KNN
-        pos = candidates->tab[0];
-      vector *move_choice = vector_create();
-      if (can_move_left(pos, *player | *opponent, direction))
-        vector_insert(move_choice, 0);
-      if (can_move_right(pos, *player | *opponent, direction))
-        vector_insert(move_choice, 1);
-      // TODO : choose with KNN
-      int j = 0;
-      if (move_choice->tab[j] == 0)
-        do_move_left(pos, player, direction);
-      else
-        do_move_right(pos, player, direction);
-      vector_delete(move_choice);
+      *player = player_choice->tab[i];
     } else {
       *player = 0;
     }
   }
+  vector_delete(player_choice);
+  vector_delete(opponent_choice);
   vector_delete(candidates);
+  vector_delete(takes);
 }
 
 void play_match(strategy strat1, strategy strat2, vector *boards,

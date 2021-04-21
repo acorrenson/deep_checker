@@ -6,13 +6,13 @@
 
 typedef void (*strategy)(unsigned *, unsigned *, int);
 
+void play_random(unsigned *player, unsigned *opponent, int direction);
+
 vector *generate_moves(vector *moves, unsigned, unsigned, int);
 
 vector *generate_takes(vector *moves, unsigned, unsigned);
 
 unsigned ask_knn(vector *moves);
-
-void play_random(unsigned *player, unsigned *opponent, int direction);
 
 void play_knn(unsigned *player, unsigned *opponent, int direction);
 
