@@ -86,15 +86,15 @@ vector *potential_moves(unsigned player, unsigned opponent, int direction) {
 }
 
 unsigned do_move_left(unsigned pos, unsigned *player, int direction) {
-  unsigned new_pos = next_left(pos, direction);
-  *player ^= (1 << pos) | (1 << new_pos);
-  return new_pos;
+  unsigned pos_next = next_left(pos, direction);
+  *player ^= (1 << pos) | (1 << pos_next);
+  return pos_next;
 }
 
 unsigned do_move_right(unsigned pos, unsigned *player, int direction) {
-  unsigned new_pos = next_right(pos, direction);
-  *player ^= (1 << pos) | (1 << new_pos);
-  return new_pos;
+  unsigned pos_next = next_right(pos, direction);
+  *player ^= (1 << pos) | (1 << pos_next);
+  return pos_next;
 }
 
 void move_choices(vector *player_choice, unsigned player, unsigned opponent,
@@ -115,6 +115,7 @@ void move_choices(vector *player_choice, unsigned player, unsigned opponent,
       vector_insert(player_choice, player_next);
     }
   }
+  vector_delete(pos_choice);
 };
 
 int can_take_left(unsigned pos, unsigned player, unsigned opponent,
@@ -164,19 +165,19 @@ vector *potential_takes(unsigned player, unsigned opponent) {
 unsigned do_take_left(unsigned pos, unsigned *player, unsigned *opponent,
                       int direction) {
   unsigned take = next_left(pos, direction);
-  unsigned new_pos = next_left(take, direction);
-  *player ^= (1 << pos) | (1 << new_pos);
+  unsigned pos_next = next_left(take, direction);
+  *player ^= (1 << pos) | (1 << pos_next);
   *opponent ^= (1 << take);
-  return new_pos;
+  return pos_next;
 }
 
 unsigned do_take_right(unsigned pos, unsigned *player, unsigned *opponent,
                        int direction) {
   unsigned take = next_right(pos, direction);
-  unsigned new_pos = next_right(take, direction);
-  *player ^= (1 << pos) | (1 << new_pos);
+  unsigned pos_next = next_right(take, direction);
+  *player ^= (1 << pos) | (1 << pos_next);
   *opponent ^= (1 << take);
-  return new_pos;
+  return pos_next;
 }
 
 int max2(int a, int b) { return (a >= b ? a : b); }
@@ -185,37 +186,40 @@ int max4(int a, int b, int c, int d) { return max2(max2(a, b), max2(c, d)); }
 
 int count_max_takes(unsigned pos, unsigned player, unsigned opponent) {
   int count[4] = {0, 0, 0, 0};
+  unsigned pos_next;
+  unsigned player_next;
+  unsigned opponent_next;
   if (can_take_left(pos, player, opponent, 0)) {
-    unsigned new_player = player;
-    unsigned new_opponent = opponent;
-    do_take_left(pos, &new_player, &new_opponent, 0);
-    count[0] = 1 + count_max_takes(pos, new_player, new_opponent);
+    player_next = player;
+    opponent_next = opponent;
+    pos_next = do_take_left(pos, &player_next, &opponent_next, 0);
+    count[0] = 1 + count_max_takes(pos_next, player_next, opponent_next);
   }
   if (can_take_right(pos, player, opponent, 0)) {
-    unsigned new_player = player;
-    unsigned new_opponent = opponent;
-    do_take_right(pos, &new_player, &new_opponent, 0);
-    count[1] = 1 + count_max_takes(pos, new_player, new_opponent);
+    player_next = player;
+    opponent_next = opponent;
+    pos_next = do_take_right(pos, &player_next, &opponent_next, 0);
+    count[1] = 1 + count_max_takes(pos_next, player_next, opponent_next);
   }
   if (can_take_left(pos, player, opponent, 1)) {
-    unsigned new_player = player;
-    unsigned new_opponent = opponent;
-    do_take_left(pos, &new_player, &new_opponent, 1);
-    count[2] = 1 + count_max_takes(pos, new_player, new_opponent);
+    player_next = player;
+    opponent_next = opponent;
+    pos_next = do_take_left(pos, &player_next, &opponent_next, 1);
+    count[2] = 1 + count_max_takes(pos_next, player_next, opponent_next);
   }
   if (can_take_right(pos, player, opponent, 1)) {
-    unsigned new_player = player;
-    unsigned new_opponent = opponent;
-    do_take_right(pos, &new_player, &new_opponent, 1);
-    count[3] = 1 + count_max_takes(pos, new_player, new_opponent);
+    player_next = player;
+    opponent_next = opponent;
+    pos_next = do_take_right(pos, &player_next, &opponent_next, 1);
+    count[3] = 1 + count_max_takes(pos_next, player_next, opponent_next);
   }
   return max4(count[0], count[1], count[2], count[3]);
 }
 
 vector *potential_max_takes(unsigned player, unsigned opponent) {
-  vector *max_takes = vector_create();
   vector *takes = potential_takes(player, opponent);
-  int max = 0;
+  vector *max_takes = vector_create();
+  int max = 1;
   for (int i = 0; i < takes->len; i++) {
     int count = count_max_takes(takes->tab[i], player, opponent);
     if (count > max) {
@@ -226,43 +230,77 @@ vector *potential_max_takes(unsigned player, unsigned opponent) {
       vector_insert(max_takes, takes->tab[i]);
     }
   }
+  vector_delete(takes);
   return max_takes;
 }
 
-int do_max_takes(unsigned *pos, unsigned *player, unsigned *opponent) {
+int pos_take_choices(vector *player_choice, vector *opponent_choice,
+                     unsigned pos, unsigned player, unsigned opponent) {
   int count[4] = {0, 0, 0, 0};
-  unsigned pos_[4] = {*pos, *pos, *pos, *pos};
-  unsigned player_[4] = {*player, *player, *player, *player};
-  unsigned opponent_[4] = {*opponent, *opponent, *opponent, *opponent};
-
-  if (can_take_left(*pos, *player, *opponent, 0)) {
-    pos_[0] = do_take_left(*pos, player_, opponent_, 0);
-    count[0] = 1 + do_max_takes(pos_, player_, opponent_);
+  vector *p_choice[4];
+  vector *o_choice[4];
+  for (int i = 0; i < 4; i++) {
+    p_choice[i] = vector_create();
+    o_choice[i] = vector_create();
   }
-  if (can_take_right(*pos, *player, *opponent, 0)) {
-    pos_[1] = do_take_right(*pos, player_ + 1, opponent_ + 1, 0);
-    count[1] = 1 + do_max_takes(pos_ + 1, player_ + 1, opponent_ + 1);
+  unsigned pos_next;
+  unsigned player_next;
+  unsigned opponent_next;
+  if (can_take_left(pos, player, opponent, 0)) {
+    player_next = player;
+    opponent_next = opponent;
+    pos_next = do_take_left(pos, &player_next, &opponent_next, 0);
+    count[0] = 1 + pos_take_choices(p_choice[0], o_choice[0], pos_next,
+                                    player_next, opponent_next);
   }
-  if (can_take_left(*pos, *player, *opponent, 1)) {
-    pos_[2] = do_take_left(*pos, player_ + 2, opponent_ + 2, 1);
-    count[2] = 1 + do_max_takes(pos_ + 2, player_ + 2, opponent_ + 2);
+  if (can_take_right(pos, player, opponent, 0)) {
+    player_next = player;
+    opponent_next = opponent;
+    pos_next = do_take_right(pos, &player_next, &opponent_next, 0);
+    count[1] = 1 + pos_take_choices(p_choice[1], o_choice[1], pos_next,
+                                    player_next, opponent_next);
   }
-  if (can_take_right(*pos, *player, *opponent, 1)) {
-    pos_[3] = do_take_right(*pos, player_ + 3, opponent_ + 3, 1);
-    count[3] = 1 + do_max_takes(pos_ + 3, player_ + 3, opponent_ + 3);
+  if (can_take_left(pos, player, opponent, 1)) {
+    player_next = player;
+    opponent_next = opponent;
+    pos_next = do_take_left(pos, &player_next, &opponent_next, 1);
+    count[2] = 1 + pos_take_choices(p_choice[2], o_choice[2], pos_next,
+                                    player_next, opponent_next);
+  }
+  if (can_take_right(pos, player, opponent, 1)) {
+    player_next = player;
+    opponent_next = opponent;
+    pos_next = do_take_right(pos, &player_next, &opponent_next, 1);
+    count[3] = 1 + pos_take_choices(p_choice[3], o_choice[3], pos_next,
+                                    player_next, opponent_next);
   }
 
   int max_count = max4(count[0], count[1], count[2], count[3]);
-  vector *take_choice = vector_create();
-  for (int i = 0; i < 4; i++)
-    if (count[i] == max_count)
-      vector_insert(take_choice, i);
-  int i = rand() % take_choice->len;
-  int j = take_choice->tab[i];
-  *pos = pos_[j];
-  *player = player_[j];
-  *opponent = opponent_[j];
-  vector_delete(take_choice);
-
+  if (max_count > 0) {
+    for (int i = 0; i < 4; i++) {
+      if (count[i] == max_count) {
+        for (int j = 0; j < p_choice[i]->len; j++) {
+          vector_insert(player_choice, p_choice[i]->tab[j]);
+          vector_insert(opponent_choice, o_choice[i]->tab[j]);
+        }
+      }
+    }
+  } else {
+    vector_insert(player_choice, player);
+    vector_insert(opponent_choice, opponent);
+  }
+  for (int i = 0; i < 4; i++) {
+    vector_delete(p_choice[i]);
+    vector_delete(o_choice[i]);
+  }
   return max_count;
 }
+
+void take_choices(vector *player_choice, vector *opponent_choice,
+                  unsigned player, unsigned opponent) {
+  vector *pos_choice = potential_max_takes(player, opponent);
+  for (int i = 0; i < pos_choice->len; i++)
+    pos_take_choices(player_choice, opponent_choice, pos_choice->tab[i], player,
+                     opponent);
+  vector_delete(pos_choice);
+};

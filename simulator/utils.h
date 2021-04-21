@@ -40,6 +40,9 @@ int max4(int a, int b, int c, int d);
 int count_max_takes(unsigned pos, unsigned player, unsigned opponent);
 vector *potential_max_takes(unsigned player, unsigned opponent);
 
-int do_max_takes(unsigned *pos, unsigned *player, unsigned *opponent);
+int pos_take_choices(vector *player_choice, vector *opponent_choice,
+                     unsigned pos, unsigned player, unsigned opponent);
+void take_choices(vector *player_choice, vector *opponent_choice,
+                  unsigned player, unsigned opponent);
 
 #endif // UTILS_H
