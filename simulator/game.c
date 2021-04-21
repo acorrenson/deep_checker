@@ -6,33 +6,30 @@
 #include <string.h>
 
 void play_random(unsigned *player, unsigned *opponent, int direction) {
-  vector *candidates = max_takes(*player, *opponent);
+  vector *player_choice = vector_create();
+  vector_insert(player_choice, *player);
+  vector *opponent_choice = vector_create();
+  vector_insert(opponent_choice, *opponent);
+  vector *candidates = potential_max_takes(*player, *opponent);
   if (candidates->len > 0) {
     int i = rand() % candidates->len;
     unsigned pos = candidates->tab[i];
     do_max_takes(&pos, player, opponent);
   } else {
     vector_delete(candidates);
+    move_choices(player_choice, opponent_choice, direction);
     candidates = potential_moves(*player, *opponent, direction);
-    if (candidates->len > 0) {
-      int i = rand() % candidates->len;
-      unsigned pos = candidates->tab[i];
-      vector *move_choice = vector_create();
-      if (can_move_left(pos, *player | *opponent, direction))
-        vector_insert(move_choice, 0);
-      if (can_move_right(pos, *player | *opponent, direction))
-        vector_insert(move_choice, 1);
-      int j = rand() % move_choice->len;
-      if (move_choice->tab[j] == 0)
-        do_move_left(pos, player, direction);
-      else
-        do_move_right(pos, player, direction);
-      vector_delete(move_choice);
+    if (player_choice->len > 1) {
+      int i = 1 + (rand() % (player_choice->len - 1));
+      *player = player_choice->tab[i];
+      *opponent = opponent_choice->tab[i];
     } else {
       *player = 0;
     }
   }
   vector_delete(candidates);
+  vector_delete(player_choice);
+  vector_delete(opponent_choice);
 }
 
 vector *generate_takes(vector *candidates, unsigned player, unsigned opponent) {
@@ -129,7 +126,7 @@ unsigned ask_knn(vector *moves) {
 }
 
 void play_knn(unsigned *player, unsigned *opponent, int direction) {
-  vector *candidates = max_takes(*player, *opponent);
+  vector *candidates = potential_max_takes(*player, *opponent);
   vector *takes = generate_takes(candidates, *player, *opponent);
   if (candidates->len > 0) {
     ask_knn(takes);

@@ -19,6 +19,8 @@ vector *potential_moves(unsigned player, unsigned opponent, int direction);
 unsigned do_move_left(unsigned pos, unsigned *player, int direction);
 unsigned do_move_right(unsigned pos, unsigned *player, int direction);
 
+void move_choices(vector *players, vector *opponents, int direction);
+
 int can_take_left(unsigned pos, unsigned player, unsigned opponent,
                   int direction);
 int can_take_right(unsigned pos, unsigned player, unsigned opponent,
@@ -35,7 +37,7 @@ int max2(int a, int b);
 int max4(int a, int b, int c, int d);
 
 int count_max_takes(unsigned pos, unsigned player, unsigned opponent);
-vector *max_takes(unsigned player, unsigned opponent);
+vector *potential_max_takes(unsigned player, unsigned opponent);
 int do_max_takes(unsigned *pos, unsigned *player, unsigned *opponent);
 
 #endif // UTILS_H

@@ -97,6 +97,33 @@ unsigned do_move_right(unsigned pos, unsigned *player, int direction) {
   return new_pos;
 }
 
+void move_choices(vector *players, vector *opponents, int direction) {
+  if (players->len != 1 || opponents->len != 1) {
+    fprintf(stderr, "Invalid vector size");
+    exit(1);
+  }
+  unsigned player = players->tab[0];
+  unsigned opponent = opponents->tab[0];
+  vector *pos_choice = potential_moves(player, opponent, direction);
+  unsigned pos;
+  unsigned player_next;
+  for (int i = 0; i < pos_choice->len; i++) {
+    pos = pos_choice->tab[i];
+    if (can_move_left(pos, player | opponent, direction)) {
+      player_next = player;
+      do_move_left(pos, &player_next, direction);
+      vector_insert(players, player_next);
+      vector_insert(opponents, opponent);
+    }
+    if (can_move_right(pos, player | opponent, direction)) {
+      player_next = player;
+      do_move_right(pos, &player_next, direction);
+      vector_insert(players, player_next);
+      vector_insert(opponents, opponent);
+    }
+  }
+};
+
 int can_take_left(unsigned pos, unsigned player, unsigned opponent,
                   int direction) {
   int row = pos / ROW_SIZE;
@@ -192,7 +219,7 @@ int count_max_takes(unsigned pos, unsigned player, unsigned opponent) {
   return max4(count[0], count[1], count[2], count[3]);
 }
 
-vector *max_takes(unsigned player, unsigned opponent) {
+vector *potential_max_takes(unsigned player, unsigned opponent) {
   vector *max_takes = vector_create();
   vector *takes = potential_takes(player, opponent);
   int max = 0;
