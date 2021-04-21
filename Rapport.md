@@ -23,6 +23,12 @@ La version finale du simulateur offre des performances remarquables. Plusieurs m
 
 ### Modèles et heuristiques
 
+#### Système de notation des coups
+
+Rappelons notre objectif est d'attribuer à un coup quelconque un score représentant intuitivement sa "qualité". Si $X$ est l'ensemble des coups possibles au jeu de dame, nous cherchons donc à trouver une fonction $h: X \to [-1, 1]$ où $h(x) = 1$ si $x$ est un excellent coup, $-1$ si c'est un très mauvais coup. Un premier squelette de la fonction $h$ peut-être construit en attribuant à chaque coup $x_i$ présent dans nos données de simulation un score $w_i$ \in [-1, 1]$. On choisi de calculer $w_i$ comme suit :
+
+Sur la base des données collectée lors de la simulation des parties
+
 #### Présentation de KNN
 
 Notre heuristique suit l'algorithme de KNN (K-Nearest Neighbors).
@@ -40,7 +46,7 @@ On commence par déterminer les coups possibles à faire. Ensuite, pour chacun d
 
 + Les coups sont représenté sous forme de suite de bite. Pour calculer la distance entre deux coups, on calcule le nombre de bite différents entre les deux coups (On fait un XOR entre les deux coups, et on compte le nombre de 1)
 
-$ Score(coup1, coup2) = somme(coup1 \xor coup2)$ 
+$Score(coup1, coup2) = somme(coup1 \oplus coup2)$
 
 + Nous avons choisi une valeur de K = 4 de manière arbitraire. Ce choix peut être sujet à discussion. 
 
