@@ -2,24 +2,27 @@
 # Deep checker
 ## Arthur Correnson, Igor Martayan, Manon Sourisseau
 
-## Introduction 
+## Introduction
+
+Dans ce projet, nous nous intéressons au jeu de dame. L'objectif est d'utiliser des méthodes d'apprentissage statistiques pour construire une intelligence artificielle capable de jouer au jeu. L'idée maîtresse étant d'apprendre une heuristique évaluant la qualité des coups. Pour se faire, nous utiliserons des données récoltées lors de la simulation d'un grand nombre de parties de jeu de dame. 
+Notons que ce projet est un projet de bout en bout, c'est à dire qu'il couvre [**1**] la génération du jeu de donnée, [**2**] le choix des modèles et enfin [**3**] l'entraînement des modèles et leur mise en pratique.
 
 
-### Création d'un simulateur de jeu de dames
+### 1 - Génération des données & création d'un simulateur de jeu de dames
 
-Pour avoir les données sur lesquels faire travailler notre heuristique, nous avons créé notre propre simulateur de jeu de dames. 
-Le simaleur est écrit dans le langage de programmation C, afin de produire rapidemment une base de donneés d'apprentissage suffisemment grande. 
+Les techniques d'apprentissage statistiques utilisent, comme leur nom l'indique, des données comme matière première. Pour avoir les données  nécessaires à l'apprentissage d'une bonne heuristique, nous avons commencé par créé notre propre simulateur de jeu de dames afin de générer un grand nombre de parties. Pour un bon apprentissage, il est primordial de disposer d'un grand nombre de données, sous peine d'obtenir une heuristique qui serait sur-spécialisée pour les quelques scénarios présentés par le jeu de données mais qui se généraliserait très mal aux autres scénarios de partie possibles.
+Il était donc nécessaire d'avoir un simulateur qui offre des grandes performances, mais également une représentation très compacte des données pour éviter de faire exploser la mémoire nécessaire à la simulation des parties et aux stockages des informations collectées.
+Nous avons donc fait le choix d'écrire le simulateur en langage C et de définir par la même une représentation binaire astucieuse des données de jeu.
 
 % Décrire comment marche le simulateur
 
 % Décrire les optimisations de code faites
 
-% Décrire la forme des données finales. 
+% Décrire la forme des données finales.
 
 
 
-
-### Heuristique
+### Modèles et heuristiques
 
 
 #### Présentation de KNN
