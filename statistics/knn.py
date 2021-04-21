@@ -1,4 +1,4 @@
-from data import vectorize_move
+from utils import vectorize_move
 import numpy as np
 import joblib
 import sys
@@ -6,7 +6,7 @@ import sys
 
 def usage():
     print(
-        f"{sys.argv[0]} init_p1 init_p2 state1_p1 state1_p2 [state3_p1 state3_p2 ... ]"
+        f"{sys.argv[0]} init_p1 init_p2 state1_p1 state1_p2 [state2_p1 state2_p2 ...]"
     )
 
 
