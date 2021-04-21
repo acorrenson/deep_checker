@@ -7,12 +7,13 @@
 
 void play_random(unsigned *player, unsigned *opponent, int direction) {
   vector *player_choice = vector_create();
-  vector *candidates = potential_max_takes(*player, *opponent);
-  if (candidates->len > 0) {
+  vector *opponent_choice = vector_create();
+  take_choices(player_choice, opponent_choice, *player, *opponent);
+  if (player_choice->len > 0) {
     // if we can take
-    int i = rand() % candidates->len;
-    unsigned pos = candidates->tab[i];
-    do_max_takes(&pos, player, opponent);
+    int i = rand() % player_choice->len;
+    *player = player_choice->tab[i];
+    *opponent = opponent_choice->tab[i];
   } else {
     move_choices(player_choice, *player, *opponent, direction);
     if (player_choice->len > 0) {
@@ -24,7 +25,7 @@ void play_random(unsigned *player, unsigned *opponent, int direction) {
     }
   }
   vector_delete(player_choice);
-  vector_delete(candidates);
+  vector_delete(opponent_choice);
 }
 
 vector *generate_moves(vector *player_choice, unsigned player,
@@ -39,42 +40,14 @@ vector *generate_moves(vector *player_choice, unsigned player,
   return moves;
 }
 
-vector *generate_takes(vector *candidates, unsigned player, unsigned opponent) {
+vector *generate_takes(vector *player_choice, vector *opponent_choice,
+                       unsigned player, unsigned opponent) {
   vector *moves = vector_create();
-  unsigned player_next;
-  unsigned opponent_next;
   vector_insert(moves, player);
   vector_insert(moves, opponent);
-  for (int i = 0; i < candidates->len; i++) {
-    unsigned pos = candidates->tab[i];
-    if (can_take_left(pos, player, opponent, 0)) {
-      player_next = player;
-      opponent_next = opponent;
-      do_take_left(pos, &player_next, &opponent_next, 0);
-      vector_insert(moves, player_next);
-      vector_insert(moves, opponent_next);
-    }
-    if (can_take_right(pos, player, opponent, 0)) {
-      player_next = player;
-      opponent_next = opponent;
-      do_take_right(pos, &player_next, &opponent_next, 0);
-      vector_insert(moves, player_next);
-      vector_insert(moves, opponent_next);
-    }
-    if (can_take_left(pos, player, opponent, 1)) {
-      player_next = player;
-      opponent_next = opponent;
-      do_take_left(pos, &player_next, &opponent_next, 1);
-      vector_insert(moves, player_next);
-      vector_insert(moves, opponent_next);
-    }
-    if (can_take_right(pos, player, opponent, 1)) {
-      player_next = player;
-      opponent_next = opponent;
-      do_take_right(pos, &player_next, &opponent_next, 1);
-      vector_insert(moves, player_next);
-      vector_insert(moves, opponent_next);
-    }
+  for (int i = 0; i < player_choice->len; i++) {
+    vector_insert(moves, player_choice->tab[i]);
+    vector_insert(moves, opponent_choice->tab[i]);
   }
   return moves;
 }
@@ -110,16 +83,15 @@ unsigned ask_knn(vector *moves) {
 void play_knn(unsigned *player, unsigned *opponent, int direction) {
   vector *player_choice = vector_create();
   vector *opponent_choice = vector_create();
-  vector *candidates = potential_max_takes(*player, *opponent);
-  vector *takes = generate_takes(candidates, *player, *opponent);
-  if (candidates->len > 0) {
+  take_choices(player_choice, opponent_choice, *player, *opponent);
+  if (player_choice->len > 0) {
     // if we can take
-    ask_knn(takes);
-    unsigned pos = candidates->tab[0];
-    if (candidates->len > 1)
-      // TODO : choose with KNN
-      pos = candidates->tab[0];
-    do_max_takes(&pos, player, opponent);
+    vector *takes =
+        generate_takes(player_choice, opponent_choice, *player, *opponent);
+    int i = ask_knn(takes);
+    vector_delete(takes);
+    *player = player_choice->tab[i];
+    *opponent = opponent_choice->tab[i];
   } else {
     move_choices(player_choice, *player, *opponent, direction);
     if (player_choice->len > 0) {
@@ -135,8 +107,6 @@ void play_knn(unsigned *player, unsigned *opponent, int direction) {
   }
   vector_delete(player_choice);
   vector_delete(opponent_choice);
-  vector_delete(candidates);
-  vector_delete(takes);
 }
 
 void play_match(strategy strat1, strategy strat2, vector *boards,
