@@ -19,7 +19,7 @@ vector *potential_moves(unsigned player, unsigned opponent, int direction);
 unsigned do_move_left(unsigned pos, unsigned *player, int direction);
 unsigned do_move_right(unsigned pos, unsigned *player, int direction);
 
-void move_choices(vector *players, vector *opponents, int direction);
+void move_choices(vector *players, unsigned opponent, int direction);
 
 int can_take_left(unsigned pos, unsigned player, unsigned opponent,
                   int direction);

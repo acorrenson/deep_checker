@@ -16,13 +16,10 @@ void play_random(unsigned *player, unsigned *opponent, int direction) {
     unsigned pos = candidates->tab[i];
     do_max_takes(&pos, player, opponent);
   } else {
-    vector_delete(candidates);
-    move_choices(player_choice, opponent_choice, direction);
-    candidates = potential_moves(*player, *opponent, direction);
+    move_choices(player_choice, *opponent, direction);
     if (player_choice->len > 1) {
       int i = 1 + (rand() % (player_choice->len - 1));
       *player = player_choice->tab[i];
-      *opponent = opponent_choice->tab[i];
     } else {
       *player = 0;
     }
@@ -64,7 +61,7 @@ vector *generate_takes(vector *candidates, unsigned player, unsigned opponent) {
     if (can_take_right(pos, player, opponent, 1)) {
       player_next = player;
       opponent_next = opponent;
-      do_take_left(pos, &player_next, &opponent_next, 1);
+      do_take_right(pos, &player_next, &opponent_next, 1);
       vector_insert(moves, player_next);
       vector_insert(moves, opponent_next);
     }

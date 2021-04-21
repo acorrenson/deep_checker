@@ -97,13 +97,12 @@ unsigned do_move_right(unsigned pos, unsigned *player, int direction) {
   return new_pos;
 }
 
-void move_choices(vector *players, vector *opponents, int direction) {
-  if (players->len != 1 || opponents->len != 1) {
+void move_choices(vector *players, unsigned opponent, int direction) {
+  if (players->len != 1) {
     fprintf(stderr, "Invalid vector size");
     exit(1);
   }
   unsigned player = players->tab[0];
-  unsigned opponent = opponents->tab[0];
   vector *pos_choice = potential_moves(player, opponent, direction);
   unsigned pos;
   unsigned player_next;
@@ -113,13 +112,11 @@ void move_choices(vector *players, vector *opponents, int direction) {
       player_next = player;
       do_move_left(pos, &player_next, direction);
       vector_insert(players, player_next);
-      vector_insert(opponents, opponent);
     }
     if (can_move_right(pos, player | opponent, direction)) {
       player_next = player;
       do_move_right(pos, &player_next, direction);
       vector_insert(players, player_next);
-      vector_insert(opponents, opponent);
     }
   }
 };
