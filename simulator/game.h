@@ -8,9 +8,11 @@ typedef void (*strategy)(unsigned *, unsigned *, int);
 
 void play_random(unsigned *player, unsigned *opponent, int direction);
 
-vector *generate_moves(vector *moves, unsigned, unsigned, int);
+vector *generate_moves(vector *player_choice, unsigned player,
+                       unsigned opponent, int direction);
 
-vector *generate_takes(vector *moves, unsigned, unsigned);
+vector *generate_takes(vector *player_choice, vector *opponent_choice,
+                       unsigned player, unsigned opponent);
 
 unsigned ask_knn(vector *moves);
 
