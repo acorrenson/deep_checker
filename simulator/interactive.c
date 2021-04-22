@@ -5,9 +5,6 @@
 #include <time.h>
 
 int main(int argc, char **argv) {
-  int runs = 1;
-  if (argc > 1)
-    runs = atoi(argv[1]);
   srand(time(NULL));
   vector *boards = vector_create();
 

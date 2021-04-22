@@ -75,7 +75,6 @@ unsigned ask_knn(vector *moves) {
     pos += sprintf(pos, "%x %x ", moves->tab[i], moves->tab[i + 1]);
   }
   *pos = '\0';
-  printf("cmd : %s\n", args);
 
   // executing the command
   FILE *fd = popen(args, "r");
@@ -85,7 +84,6 @@ unsigned ask_knn(vector *moves) {
   }
   int i = 0;
   fscanf(fd, "%d", &i);
-  printf("returned %d\n", i);
   pclose(fd);
 
   return i;
