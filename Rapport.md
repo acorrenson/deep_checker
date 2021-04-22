@@ -79,7 +79,7 @@ On commence par déterminer l'ensemble des coups $c_i$ jouables. Le prochain cou
 Empiriquement, nous avons choisi une valeur de $k = 4$. Ce choix peut être sujet à discussion.
 
 #### Résultats de l'approche KNN
-
+ 
 Une fois la méthode KNN mise en place, nous avons observé les résultats sur des vrais parties. Pour se faire, nous simulons 50 parties dans lesquelles le joueur 1 choisit les meilleurs coup selon l'heuristique généralisée par KNN et le joueur 2 joue au hasard. Les résultats obtenus sont très peu convaincants :
 
 | Victoires du joueur 1 (KNN) | Victoires du joueur 2 (Aléatoire) |
