@@ -8,7 +8,7 @@ int main(int argc, char **argv) {
   srand(time(NULL));
   vector *boards = vector_create();
 
-  play_match(play_knn, play_random, boards, 1);
+  play_match(play_mlp, play_random, boards, 1);
 
   if (boards->tab[boards->len - 2])
     printf("Player 1 wins!\n");
