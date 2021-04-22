@@ -1,4 +1,4 @@
-from utils import vectorize_scores
+from utils import vectorize_scores, vectorize_scores_old
 import numpy as np
 import joblib
 import sys
@@ -7,6 +7,9 @@ import sys
 max_games = 5000
 if len(sys.argv) > 1:
     max_games = int(sys.argv[1])
+out = "scores.save"
+if len(sys.argv) > 2:
+    out = sys.argv[2]
 games = []
 
 with open("boards.csv") as f:
@@ -33,6 +36,22 @@ def get_player_moves(game: tuple, player: int):
 
 def get_scores(games: list, heuristic):
     """
+    Associates scores to states
+    """
+    scores = dict()
+    for game in games:
+        win = game[-1][1] == 0
+        moves = get_player_moves(game, 0)
+        for j in range(len(moves)):
+            if moves[j][1] in scores:
+                scores[moves[j][1]].append(heuristic(moves, j, win))
+            else:
+                scores[moves[j][1]] = [heuristic(moves, j, win)]
+    return scores
+
+
+def get_scores_old(games: list, heuristic):
+    """
     Associates scores to moves
     """
     scores = dict()
@@ -47,15 +66,11 @@ def get_scores(games: list, heuristic):
     return scores
 
 
-def heuristic1(moves: tuple, i: int, win: bool):
+def heuristic_sqrt(moves: tuple, i: int, win: bool):
     return (1 if win else -1) / np.sqrt(len(moves) - i)
 
 
-def heuristic2(moves: tuple, i: int, win: bool):
-    return (1 if win else -1) / (len(moves) - i)
-
-
-def heuristic3(moves: tuple, i: int, win: bool):
+def heuristic_takes(moves: tuple, i: int, win: bool):
     op1 = moves[i][0][1]
     n1 = bin(op1).count("1")
     op2 = moves[-1][1][1]
@@ -63,12 +78,10 @@ def heuristic3(moves: tuple, i: int, win: bool):
     return n1 - n2
 
 
-scores = get_scores(games, heuristic3)
+# scores = get_scores_old(games, heuristic_sqrt)
+# X, Y = vectorize_scores_old(scores)
+
+scores = get_scores(games, heuristic_takes)
 X, Y = vectorize_scores(scores)
 
-joblib.dump((X, Y), "scores.save")
-
-for k in scores:
-    print(
-        f"h({hex(k[0][0]), hex(k[0][1])} -> {hex(k[1][0]), hex(k[1][1])}) = {scores[k]}"
-    )
+joblib.dump((X, Y), out)
