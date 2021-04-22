@@ -22,6 +22,7 @@ Afin de simplifier la simulation et la modélisation des parties du jeu de dames
 - les prises de pions peuvent être effectuées les unes à la suite des autres
 - la prise majoritaire est obligatoire : si plusieurs prises sont possibles, le joueur doit obligatoirement choisir celle qui prend le plus de pions adverses
 - on ne tient pas compte de la promotion des pions lorsqu'ils arrivent au bout du plateau
+- un joueur qui ne peut plus jouer de coups perd la partie
 
 ## 1 - Génération des données & création d'un simulateur de jeu de dames
 
