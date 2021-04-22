@@ -132,5 +132,13 @@ Les résultats obtenus grâce au nouveau modèle sont bien plus intéressants. E
 | --------------------------- | --------------------------------- |
 | 50                          | 0                                 |
 
+### Résultats finaux
+
+| Heursitiques + Models        | Victoires | Défaites |
+| ---------------------------- | :-------: | :------: |
+| Distance à la victoire + KNN |    18     |    32    |
+| Nombre de prises + MLP       |    50     |    0     |
+| Nombre de prises + KNN       |    36     |    14    |
+
 ## Conclusion
 
