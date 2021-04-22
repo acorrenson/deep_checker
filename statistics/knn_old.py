@@ -1,4 +1,4 @@
-from utils import vectorize_state
+from utils import vectorize_move
 import numpy as np
 import joblib
 import sys
@@ -26,9 +26,9 @@ if __name__ == "__main__":
     for i in range(3, len(sys.argv) - 1, 2):
         state_p1 = int(sys.argv[i], 16)
         state_p2 = int(sys.argv[i + 1], 16)
-        state = vectorize_state((state_p1, state_p2))
-        state_vec = np.array([state])
-        score = knn.predict(state_vec)
+        move = vectorize_move(((init_p1, init_p2), (state_p1, state_p2)))
+        move_vec = np.array([move])
+        score = knn.predict(move_vec)
         scores.append(score)
         if score > scores[imax]:
             imax = (i - 3) // 2

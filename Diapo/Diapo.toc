@@ -1,2 +1,4 @@
 \beamer@sectionintoc {1}{Génération de données et simulateur}{4}{0}{1}
 \beamer@sectionintoc {2}{Modèles et heuristiques}{8}{0}{2}
+\beamer@sectionintoc {3}{Régression aux k plus proches voisins}{11}{0}{3}
+\beamer@sectionintoc {4}{Réseau de perceptron}{14}{0}{4}
