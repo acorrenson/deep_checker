@@ -1,8 +1,7 @@
-from utils import vectorize_scores, vectorize_scores_old
+import utils
 import numpy as np
 import joblib
 import sys
-
 
 max_games = 5000
 if len(sys.argv) > 1:
@@ -79,9 +78,9 @@ def heuristic_takes(moves: tuple, i: int, win: bool):
 
 
 # scores = get_scores_old(games, heuristic_sqrt)
-# X, Y = vectorize_scores_old(scores)
+# X, Y = utils.vectorize_scores_old(scores)
 
 scores = get_scores(games, heuristic_takes)
-X, Y = vectorize_scores(scores)
+X, Y = utils.vectorize_scores(scores)
 
 joblib.dump((X, Y), out)
