@@ -1,13 +1,24 @@
 from utils import vectorize_scores
 import numpy as np
 import joblib
+import sys
 
 
-def get_winner(game):
-    """
-    Returns the winner of the game (0 or 1)
-    """
-    return 1 - (len(game) % 2)
+max_games = 5000
+if len(sys.argv) > 1:
+    max_games = int(sys.argv[1])
+games = []
+
+with open("boards.csv") as f:
+    for i, line in enumerate(f):
+        if i >= max_games:
+            break
+        boards = line.split()
+        game = []
+        for i in range(0, len(boards) - 1, 2):
+            state = (int(boards[i], 16), int(boards[i + 1], 16))
+            game.append(state)
+        games.append(game)
 
 
 def get_player_moves(game: tuple, player: int):
@@ -26,7 +37,7 @@ def get_scores(games: list, heuristic):
     """
     scores = dict()
     for game in games:
-        win = get_winner(game) == 0
+        win = game[-1][1] == 0
         moves = get_player_moves(game, 0)
         for j in range(len(moves)):
             if moves[j] in scores:
@@ -44,25 +55,20 @@ def heuristic2(moves: tuple, i: int, win: bool):
     return (1 if win else -1) / (len(moves) - i)
 
 
-data = []
-
-with open("boards.csv") as f:
-    for i, game in enumerate(f):
-        if i > 1:
-            break
-        moves = game.split()
-        liste_couples = []
-        for i in range(0, len(moves) - 1, 2):
-            couple = (int(moves[i], 16), int(moves[i + 1], 16))
-            liste_couples.append(couple)
-        data.append(liste_couples)
+def heuristic3(moves: tuple, i: int, win: bool):
+    op1 = moves[i][0][1]
+    n1 = bin(op1).count("1")
+    op2 = moves[-1][1][1]
+    n2 = bin(op2).count("1")
+    return n1 - n2
 
 
-scores = get_scores(data, heuristic1)
+scores = get_scores(games, heuristic3)
 X, Y = vectorize_scores(scores)
 
 joblib.dump((X, Y), "scores.save")
 
 for k in scores:
     print(
-        f"h({hex(k[0][0]), hex(k[0][1])} -> {hex(k[1][0]), hex(k[1][1])}) = {scores[k]}")
+        f"h({hex(k[0][0]), hex(k[0][1])} -> {hex(k[1][0]), hex(k[1][1])}) = {scores[k]}"
+    )
