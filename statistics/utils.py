@@ -20,6 +20,15 @@ def vectorize_move(move):
 
 
 def vectorize_scores(scores):
+    X = np.zeros((len(scores), 64), dtype=np.uint8)
+    Y = np.zeros((len(scores), 1), dtype=np.float32)
+    for i, (state, score) in enumerate(scores.items()):
+        X[i, :] = vectorize_state(state)
+        Y[i, :] = sum(score) / len(score)
+    return X, Y
+
+
+def vectorize_scores_old(scores):
     X = np.zeros((len(scores), 128), dtype=np.uint8)
     Y = np.zeros((len(scores), 1), dtype=np.float32)
     for i, (move, score) in enumerate(scores.items()):

@@ -12,11 +12,15 @@ void print_board(unsigned player1, unsigned player2) {
     for (int col = 0; col < BOARD_SIZE; col++) {
       printf("|");
       if ((row ^ col) & 1) {
-        if (player1 & 1)
+        if (player1 & 1) {
+          printf("\033[1;36m");
           printf(" x ");
-        else if (player2 & 1)
-          printf(" o ");
-        else
+          printf("\033[0m");
+        } else if (player2 & 1) {
+          printf("\033[1;31m");
+          printf(" x ");
+          printf("\033[0m");
+        } else
           printf("   ");
         player1 >>= 1;
         player2 >>= 1;

@@ -75,7 +75,7 @@ unsigned ask_program(vector *moves, char *cmd) {
     pos += sprintf(pos, "%x %x ", moves->tab[i], moves->tab[i + 1]);
   }
   *pos = '\0';
-  printf("cmd : %s\n", args);
+  // printf("cmd : %s\n", args);
 
   // executing the command
   FILE *fd = popen(args, "r");
