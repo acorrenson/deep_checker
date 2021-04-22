@@ -1,4 +1,4 @@
-from utils import vectorize_move
+from utils import vectorize_state
 import numpy as np
 import joblib
 import sys
@@ -11,7 +11,7 @@ def usage():
 
 
 if __name__ == "__main__":
-    knn_model = joblib.load("knn.save", "r")
+    knn = joblib.load("knn.save", "r")
 
     if len(sys.argv) < 5 or (len(sys.argv) - 3) % 2 == 1:
         usage()
@@ -26,9 +26,9 @@ if __name__ == "__main__":
     for i in range(3, len(sys.argv) - 1, 2):
         state_p1 = int(sys.argv[i], 16)
         state_p2 = int(sys.argv[i + 1], 16)
-        move = vectorize_move(((init_p1, init_p2), (state_p1, state_p2)))
-        move_vec = np.array([move])
-        score = knn_model.predict(move_vec)
+        state = vectorize_state((state_p1, state_p2))
+        state_vec = np.array([state])
+        score = knn.predict(state_vec)
         scores.append(score)
         if score > scores[imax]:
             imax = (i - 3) // 2
