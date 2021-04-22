@@ -50,7 +50,7 @@ Soit $\mathcal{DB}$ une collection de parties simulées et soit $P_i$ un éléme
 Si $X$ est l'univers de tous les coups possibles du joueur 1 au jeu de dame, nous cherchons maintenant à trouver une fonction $h: X \to [-1, 1]$ où $h(x) = 1$ si $x$ est un excellent coup, $-1$ si c'est un très mauvais coup. Un premier squelette partiel de la fonction $h$ peut-être construit à partir de nos données de simulation $\mathcal{DB}$ comme suit :
 
 + Pour chaque partie $P_i \in \mathcal{DB}$ on calcul $C_i$ l'ensemble des coups joués par le joueur 1 au cours de $P_i$
-+ On équipe chaque $P_i$ d'une *distance* notée $\lVert.\rVert_i : C_i \to \mathbb{N}$ qui caractérise la distance à la victoire d'un coup dans $P_i$ et définie comme : $\lVert c \rVert_i = \frac{1}{\sqrt{d(c)}}.v(c)$ où $d(c) \in \mathbb{N}$ est le nombre de coups qui séparent $c$ de la fin de partie et $v(c) = 1$ si le joueur 1 a gagné et $v(c) = 0$ sinon
++ On équipe chaque $P_i$ d'une *fonction d'évaluation* notée $\lVert.\rVert_i : C_i \to \mathbb{N}$ qui caractérise la distance à la victoire d'un coup dans $P_i$ et définie comme : $\lVert c \rVert_i = \frac{1}{\sqrt{d(c)}}.v(c)$ où $d(c) \in \mathbb{N}$ est le nombre de coups qui séparent $c$ de la fin de partie et $v(c) = 1$ (resp. $0$) si le joueur 1 a gagné (resp. perdu).
 + On construit maintenant une fonction $w_i(c)$ telle que $w_i(c) = \lVert c \lVert_i$ si $c \in C_i$ et $w_i(c) = 0$ sinon
 + Pour chaque coup $c$ apparaissant dans l'ensemble des parties de $\mathcal{DB}$, $h(c) = \frac{1}{N}\Sigma w_i(c)$ avec $N$ le nombre de $P_i$ tels que $w_i(c) \neq 0$ ($c$ est un coup joué au cours de $P_i$)
 
@@ -108,7 +108,7 @@ Afin de rendre plus homogène la modélisation, nous changeons complètement la 
 Le score de damier $d$ dans $\mathcal{DB}$ est alors calculé comme suit :
 
 + Pour chaque partie $P_i \in \mathcal{DB}$ on on note $D_i$ l'ensemble des états du damier vu par le joueur 1 au cours de $P_i$
-+ On équipe à nouveau $P_i$ d'une *distance* notée $\lVert.\rVert_i : D_i \to \mathbb{N}$ définie comme : $\lVert d \rVert_i = p(d).v(d)$ où $p(c) \in \mathbb{N}$ est le nombre de prises faites par le joueur 1 à partir de l'état courant $d$ et $v(d) = 1$ si le joueur 1 a gagné et $v(c) = 0$ sinon
++ On équipe à nouveau $P_i$ d'une fonction d'évaluation notée $\lVert.\rVert_i : D_i \to \mathbb{N}$ définie comme : $\lVert d \rVert_i = p(d).v(d)$ où $p(c) \in \mathbb{N}$ est le nombre de prises faites par le joueur 1 à partir de l'état courant $d$ et $v(d) = 1$ si le joueur 1 a gagné et $v(c) = 0$ sinon
 + On construit maintenant une fonction $w_i(c)$ telle que $w_i(d) = \lVert c \lVert_i$ si $d \in D_i$ et $w_i(d) = 0$ sinon
 + Pour chaque état de damier $d$ apparaissant dans l'ensemble des parties de $\mathcal{DB}$, $h(d) = \frac{1}{N}\Sigma w_i(d)$ avec $N$ le nombre de parties $P_i$ tels que $w_i(d) \neq 0$ ($d$ est l'un des états pris par le damier dans $P_i$)
 
