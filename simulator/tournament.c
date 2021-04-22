@@ -14,8 +14,9 @@ int main(int argc, char **argv) {
   int win1 = 0;
   int win2 = 0;
   for (int i = 0; i < runs; i++) {
+    printf("Game %d\n", i + 1);
     boards->len = 0;
-    play_match(play_random, play_random, boards, 0);
+    play_match(play_mlp, play_random, boards, 0);
     if (boards->tab[boards->len - 2])
       win1++;
     else
