@@ -14,6 +14,9 @@ add_library(game
 add_executable(simulator simulator.c)
 target_link_libraries(simulator game)
 
+add_executable(tournament tournament.c)
+target_link_libraries(tournament game)
+
 add_executable(interactive interactive.c)
 target_link_libraries(interactive game)
 
