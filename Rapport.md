@@ -1,14 +1,19 @@
-# Projet de Statistiques, 2021
-# Deep checker
-## Arthur Correnson, Igor Martayan, Manon Sourisseau
+---
+title: "Deep Checker"
+subtitle: "Projet de statistiques ENS Rennes 2020"
+author:
+- Arthur Correnson
+- Igor Martayan
+- Manon Sourisseau
+---
 
-## Introduction
+# Introduction
 
 Dans ce projet, nous nous intéressons au jeu de dame. L'objectif est d'utiliser des méthodes d'apprentissage statistiques pour construire une intelligence artificielle capable de jouer au jeu. L'idée maîtresse étant d'apprendre une heuristique évaluant la qualité des coups. Pour se faire, nous utiliserons des données récoltées lors de la simulation d'un grand nombre de parties de jeu de dame. 
 Notons que ce projet est un projet de bout en bout, c'est à dire qu'il couvre [**1**] la génération du jeu de donnée, [**2**] le choix des modèles et enfin [**3**] l'entraînement des modèles et leur mise en pratique.
 
 
-### 1 - Génération des données & création d'un simulateur de jeu de dames
+## 1 - Génération des données & création d'un simulateur de jeu de dames
 
 Les techniques d'apprentissage statistiques utilisent, comme leur nom l'indique, des données comme matière première. Pour avoir les données nécessaires à l'apprentissage d'une bonne heuristique, nous avons commencé par créé notre propre simulateur de jeu de dames. Pour un bon apprentissage, il est primordial de disposer d'un grand nombre de données, sous peine d'obtenir une heuristique qui serait sur-spécialisée pour les quelques scénarios présentés par le jeu de données mais qui se généraliserait très mal aux autres scénarios de partie possibles.
 Afin de générer un grand volume de données, il était donc nécessaire d'avoir un simulateur qui offre des grandes performances, mais également une représentation très compacte des données pour éviter de faire exploser la mémoire nécessaire à la simulation des parties et aux stockages des informations collectées.
@@ -21,15 +26,22 @@ Le simulateur garde une trace complète de chaque partie sous la forme d'une lis
 
 La version finale du simulateur offre des performances remarquables. Plusieurs milliers de parties peuvent-être simulées en moins d'une seconde sur un ordinateur classique. Notons que l'essentiel du temps de simulation est consacré à l'écriture des données dans un fichier texte. Une amélioration possible serait donc d'écrire les données binaires directement dans un fichier afin d'éviter les temps d'entrées sorties trop long et les surcoût lié à la conversion des données binaires vers des données textuelles. Nous avons tout de même fait le choix de conserver une représentation finale textuelle afin de faciliter la lecture des données par des outils externes (tableurs, scripts python, etc).
 
-### Modèles et heuristiques
+## 2 - Modèles et heuristiques
 
-#### Système de notation des coups
+Rappelons notre objectif est de construire une fonction (heuristique) permettant d'attribuer à un coup quelconque un score représentant intuitivement sa "qualité". Par souci de simplicité dans les modélisations, on s'intéressera uniquement aux coups de l'un des deux joueurs que l'on appellera joueur 1 (l'autre sera appellé joueur 2). A symétrie du damier près, les résultats obtenus pour noter les coups du joueurs 1 sont toujours généralisables aux coups du joueur 2. Nous présentons plusieurs approches pour déterminer une *bonne* heuristique.
 
-Rappelons notre objectif est d'attribuer à un coup quelconque un score représentant intuitivement sa "qualité". Si $X$ est l'ensemble des coups possibles au jeu de dame, nous cherchons donc à trouver une fonction $h: X \to [-1, 1]$ où $h(x) = 1$ si $x$ est un excellent coup, $-1$ si c'est un très mauvais coup. Un premier squelette de la fonction $h$ peut-être construit en attribuant à chaque coup $x_i$ présent dans nos données de simulation un score $w_i$ \in [-1, 1]$. On choisi de calculer $w_i$ comme suit :
+### Un premier système de notation des coups
 
-Sur la base des données collectée lors de la simulation des parties
+Soit $\mathcal{DB}$ une collection de parties simulées et soit $P_i$ un élément de $\mathcal{DB}$. $P_i$ est une suite de damiers de laquelle on peut extraire l'ensemble $C$ des coups $c$ joués (un coup est simplement une paire de damier) au cours de la partie. Notons qu'au jeu de dame, un même coup (enchaînement de 2 plateaux) ne peut se produire qu'une seule fois par partie au plus. Cette singularité est due au système de règles qui interdit de jouer en arrière.
 
-#### Présentation de KNN
+Si $X$ est l'univers de tous les coups possibles du joueur 1 au jeu de dame, nous cherchons maintenant à trouver une fonction $h: X \to [-1, 1]$ où $h(x) = 1$ si $x$ est un excellent coup, $-1$ si c'est un très mauvais coup. Un premier squelette partiel de la fonction $h$ peut-être construit à partir de nos données de simulation $\mathcal{DB}$ comme suit :
+
++ Pour chaque partie $P_i \in \mathcal{DB}$ on calcul $C_i$ l'ensemble des coups joués par le joueur 1 au cours de $P_i$
++ On équipe chaque $P_i$ d'une *distance* notée $\lVert.\rVert_i : C_i \to \mathbb{N}$ qui caractérise la distance à la victoire d'un coup dans $P_i$ et définie comme : $\lVert c \rVert_i = d(c).v(c)$ où $d(c) \in \mathbb{N}$ est le nombre de coups qui séparent $c$ de la fin de partie et $v(c) = 1$ si le joueur 1 a gagné et $v(c) = 0$ sinon
++ On construit maintenant une fonction $w_i(c)$ telle que $w_i(c) = \lVert c \lVert_i$ si $c \in C_i$ et $w_i(c) = 0$ sinon
++ Pour chaque coup $c$ apparaissant dans l'ensemble des parties de $\mathcal{DB}$, $h(c) = \frac{1}{N}\Sigma w_i(c)$ avec $N$ le nombre de $i$ tel que $w_i(c) \neq 0$
+
+### Présentation de KNN
 
 Notre heuristique suit l'algorithme de KNN (K-Nearest Neighbors).
 Cet algorithme de machine learning est une algorithme d'apprentissage supervisé, qui fonctionne de la manière suivante :
@@ -38,7 +50,7 @@ Cet algorithme de machine learning est une algorithme d'apprentissage supervisé
 + On sélectionne les K plus proches voisins selon la distance calculés.
 + On attribut à notre entrée la moyenne des valeurs des K plus proches voisins. 
 
-#### Adaptation de KNN à notre heuristique
+### Adaptation de KNN à notre heuristique
 
 Dans une situation de plateau donnée, l'heuristique calcule le coups suivant à faire de la manière suivante :
 

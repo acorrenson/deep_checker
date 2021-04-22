@@ -10,7 +10,7 @@ def get_winner(game):
     return 1 - (len(game) % 2)
 
 
-def get_player_moves(game, player):
+def get_player_moves(game: tuple, player: int):
     """
     Returns the sequence of moves of the given player
     """
@@ -20,7 +20,7 @@ def get_player_moves(game, player):
     return moves
 
 
-def get_scores(games, heuristic):
+def get_scores(games: list, heuristic):
     """
     Associates scores to moves
     """
@@ -36,11 +36,11 @@ def get_scores(games, heuristic):
     return scores
 
 
-def heuristic1(moves, i, win):
+def heuristic1(moves: tuple, i: int, win: bool):
     return (1 if win else -1) / np.sqrt(len(moves) - i)
 
 
-def heuristic2(moves, i, win):
+def heuristic2(moves: tuple, i: int, win: bool):
     return (1 if win else -1) / (len(moves) - i)
 
 
@@ -48,7 +48,7 @@ data = []
 
 with open("boards.csv") as f:
     for i, game in enumerate(f):
-        if i > 1000:
+        if i > 1:
             break
         moves = game.split()
         liste_couples = []
@@ -62,3 +62,7 @@ scores = get_scores(data, heuristic1)
 X, Y = vectorize_scores(scores)
 
 joblib.dump((X, Y), "scores.save")
+
+for k in scores:
+    print(
+        f"h({hex(k[0][0]), hex(k[0][1])} -> {hex(k[1][0]), hex(k[1][1])}) = {scores[k]}")
