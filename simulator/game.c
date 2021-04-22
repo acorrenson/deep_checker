@@ -52,11 +52,11 @@ vector *generate_takes(vector *player_choice, vector *opponent_choice,
   return moves;
 }
 
-unsigned ask_knn(vector *moves) {
+unsigned ask_program(vector *moves, char *cmd) {
   // building command line
-  char *cmd = "python3 knn.py";
   size_t cmd_len = strlen(cmd);
   size_t buff_size = cmd_len + moves->len * 9 * 4;
+
   char *args = malloc(buff_size + 1);
   memcpy(args, cmd, cmd_len);
   args[cmd_len] = ' ';
@@ -85,13 +85,13 @@ unsigned ask_knn(vector *moves) {
   }
   int i = 0;
   fscanf(fd, "%d", &i);
-  printf("returned %d\n", i);
   pclose(fd);
 
   return i;
 }
 
-void play_knn(unsigned *player, unsigned *opponent, int direction) {
+void play_program(unsigned *player, unsigned *opponent, int direction,
+                  char *cmd) {
   vector *player_choice = vector_create();
   vector *opponent_choice = vector_create();
   take_choices(player_choice, opponent_choice, *player, *opponent);
@@ -99,7 +99,7 @@ void play_knn(unsigned *player, unsigned *opponent, int direction) {
     // if we can take
     vector *takes =
         generate_takes(player_choice, opponent_choice, *player, *opponent);
-    int i = ask_knn(takes);
+    int i = ask_program(takes, cmd);
     vector_delete(takes);
     *player = player_choice->tab[i];
     *opponent = opponent_choice->tab[i];
@@ -109,7 +109,7 @@ void play_knn(unsigned *player, unsigned *opponent, int direction) {
       // if we can move
       vector *moves =
           generate_moves(player_choice, *player, *opponent, direction);
-      int i = ask_knn(moves);
+      int i = ask_program(moves, cmd);
       vector_delete(moves);
       *player = player_choice->tab[i];
     } else {
@@ -118,6 +118,16 @@ void play_knn(unsigned *player, unsigned *opponent, int direction) {
   }
   vector_delete(player_choice);
   vector_delete(opponent_choice);
+}
+
+void play_knn(unsigned *player, unsigned *opponent, int direction) {
+  char *cmd = "python3 knn.py";
+  play_program(player, opponent, direction, cmd);
+}
+
+void play_mlp(unsigned *player, unsigned *opponent, int direction) {
+  char *cmd = "python3 mlp.py";
+  play_program(player, opponent, direction, cmd);
 }
 
 void play_match(strategy strat1, strategy strat2, vector *boards,

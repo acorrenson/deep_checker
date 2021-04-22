@@ -14,9 +14,14 @@ add_library(game
 add_executable(simulator simulator.c)
 target_link_libraries(simulator game)
 
+add_executable(tournament tournament.c)
+target_link_libraries(tournament game)
+
 add_executable(interactive interactive.c)
 target_link_libraries(interactive game)
 
 file(COPY ../statistics/utils.py DESTINATION ${CMAKE_BINARY_DIR})
 file(COPY ../statistics/knn.py DESTINATION ${CMAKE_BINARY_DIR})
 file(COPY ../statistics/knn.save DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY ../statistics/mlp.py DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY ../statistics/mlp.save DESTINATION ${CMAKE_BINARY_DIR})
