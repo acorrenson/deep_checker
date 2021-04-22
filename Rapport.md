@@ -32,7 +32,9 @@ Rappelons notre objectif est de construire une fonction (heuristique) permettant
 
 ### Un premier système de notation des coups
 
-Soit $\mathcal{DB}$ une collection de parties simulées et soit $P_i$ un élément de $\mathcal{DB}$. $P_i$ est une suite de damiers de laquelle on peut extraire l'ensemble $C$ des coups $c$ joués (un coup est simplement une paire de damier) au cours de la partie. Notons qu'au jeu de dame, un même coup (enchaînement de 2 plateaux) ne peut se produire qu'une seule fois par partie au plus. Cette singularité est due au système de règles qui interdit de jouer en arrière.
+Soit $\mathcal{DB}$ une collection de parties simulées et soit $P_i$ un élément de $\mathcal{DB}$. $P_i$ est une suite de damiers de laquelle on peut extraire l'ensemble $C$ des coups $c$ joués au cours de la partie. Un coup $c$ pourra simplement être vu comme une paire de damier représentant l'état du jeu avant et après le coup. Notons qu'au jeu de dame, un même coup ne peut se produire qu'une seule fois par partie au plus. Cette singularité est due au système de règles qui interdit de jouer en arrière.
+
+#### Modélisation du problème
 
 Si $X$ est l'univers de tous les coups possibles du joueur 1 au jeu de dame, nous cherchons maintenant à trouver une fonction $h: X \to [-1, 1]$ où $h(x) = 1$ si $x$ est un excellent coup, $-1$ si c'est un très mauvais coup. Un premier squelette partiel de la fonction $h$ peut-être construit à partir de nos données de simulation $\mathcal{DB}$ comme suit :
 
@@ -41,31 +43,35 @@ Si $X$ est l'univers de tous les coups possibles du joueur 1 au jeu de dame, nou
 + On construit maintenant une fonction $w_i(c)$ telle que $w_i(c) = \lVert c \lVert_i$ si $c \in C_i$ et $w_i(c) = 0$ sinon
 + Pour chaque coup $c$ apparaissant dans l'ensemble des parties de $\mathcal{DB}$, $h(c) = \frac{1}{N}\Sigma w_i(c)$ avec $N$ le nombre de $i$ tel que $w_i(c) \neq 0$
 
-### Présentation de KNN
+#### Pseudo-apprentissage par régression aux $k$ plus proches voisins
+
+Une fois le squelette de $h$ élaboré, on souhaite le généraliser afin de pouvoir noter un coup $c$ quelconque n'apparaissant pas forcément dans $\mathcal{DB}$. Pour se faire, on utilise une méthode dite de régression aux $k$ plus proches voisins (KNN). Cette méthode consiste essentiellement à généraliser le squelette de $h$ de sorte que pour tout coup $c$ hors du domaine de $h$, on attribue à $c$ le score moyen des $k$ coups les *plus proches* de $c$ dans le domaine. La notion de *plus proches* s'obtient naturellement à partir de la définition d'une distance. Nous choisissons ici d'introduire la distance entre coups $\langle ., . \rangle_{KNN} : X \to \mathbb{N}$ définie comme la [distance d'édition](https://fr.wikipedia.org/wiki/Distance_de_Levenshtein) entre deux damiers. Intuitivement, il s'agit de compter le nombre de pions qui diffèrent entre les deux coups vu comme des couples de damiers.
+
+**Remarque** Dans notre implémentation, les coups sont représentés sous forme de séquences de 128 bits. Le calcul de la distance entre deux coups se réduit alors à un calcul de XOR bit à bit suivi du comptage du nombre de bits à 1 :
+
+$$
+  \langle c_1, c_2 \rangle_{KNN} = \ \rVert c_1 \oplus c_2 \lVert_1
+$$
+
+On notera $KNN(k, c)$ le score obtenu pour le coup $c$ par régression aux $k$ plus proche voisins.
+
+<!-- ### Présentation de KNN
 
 Notre heuristique suit l'algorithme de KNN (K-Nearest Neighbors).
 Cet algorithme de machine learning est une algorithme d'apprentissage supervisé, qui fonctionne de la manière suivante :
 
 + On calcule la distance entre l'entrée et chaque éléments de la  base de donnée 
 + On sélectionne les K plus proches voisins selon la distance calculés.
-+ On attribut à notre entrée la moyenne des valeurs des K plus proches voisins. 
++ On attribut à notre entrée la moyenne des valeurs des K plus proches voisins.  -->
 
-### Adaptation de KNN à notre heuristique
+#### Mise en pratique de KNN
 
-Dans une situation de plateau donnée, l'heuristique calcule le coups suivant à faire de la manière suivante :
+Dans une situation de plateau donnée, notre heuristique permet calculer le coups suivant à jouer de la manière suivante :
 
-On commence par déterminer les coups possibles à faire. Ensuite, pour chacun de ces coups, nous calculons un score associé à chaque coup, déterminé avec l'algorithme KNN de la manière suivante :
-
-+ Les coups sont représenté sous forme de suite de bite. Pour calculer la distance entre deux coups, on calcule le nombre de bite différents entre les deux coups (On fait un XOR entre les deux coups, et on compte le nombre de 1)
-
-$Score(coup1, coup2) = somme(coup1 \oplus coup2)$
-
-+ Nous avons choisi une valeur de K = 4 de manière arbitraire. Ce choix peut être sujet à discussion. 
-
-+ Le score donné au coup d'entrée correspond alors à la moyenne des scores des K plus proches voisins. 
+On commence par déterminer l'ensemble des coups $c_i$ jouables. Le prochain coup à jouer est alors $\textrm{arg}\min_{c_i} \ KNN(k, c_i)$
 
 
-Enfin, on sélectionne le coups possible ayant le plus grand score. 
+Empiriquement, nous avons choisi une valeur de $k = 4$. Ce choix peut être sujet à discussion. 
 
 ## Conclusion
 
