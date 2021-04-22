@@ -1,6 +1,6 @@
 ---
 title: "Deep Checker"
-subtitle: "Projet de statistiques ENS Rennes 2020"
+subtitle: "Projet de statistiques ENS Rennes 2021"
 author:
 - Arthur Correnson
 - Igor Martayan

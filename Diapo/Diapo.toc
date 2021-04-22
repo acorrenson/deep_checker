@@ -1,0 +1,2 @@
+\beamer@sectionintoc {1}{Génération de données et simulateur}{4}{0}{1}
+\beamer@sectionintoc {2}{Modèles et heuristiques}{8}{0}{2}
