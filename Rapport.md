@@ -89,8 +89,8 @@ Empiriquement, nous avons choisi une valeur de $k = 4$. Ce choix peut être suje
 Une fois la méthode KNN mise en place, nous avons observé les résultats sur des vraies parties. Pour se faire, nous simulons 50 parties dans lesquelles le joueur 1 choisit les meilleurs coups selon l'heuristique généralisée par KNN et le joueur 2 joue au hasard. Les résultats obtenus sont très peu convaincants :
 
 | Victoires du joueur 1 (KNN) | Victoires du joueur 2 (Aléatoire) |
-| --------------------------- | --------------------------------- |
-| 18                          | 32                                |
+| :-------------------------: | :-------------------------------: |
+|             18              |                32                 |
 
 Ces résultats peuvent s'expliquer de plusieurs manières.
 
@@ -133,8 +133,8 @@ Afin d'éviter des problèmes d'*overfitting* (le réseau devient sur-spécialis
 Les résultats obtenus grâce au nouveau modèle sont bien plus intéressants. Encore une fois, nous avons simulé 50 parties où le joueur 1 choisit les meilleurs coups selon l'heuristique apprise par le réseau et le joueur 2 est aléatoire. Les résultats sont clairs :
 
 | Victoires du joueur 1 (MLP) | Victoires du joueur 2 (Aléatoire) |
-| --------------------------- | --------------------------------- |
-| 50                          | 0                                 |
+| :-------------------------: | :-------------------------------: |
+|             50              |                 0                 |
 
 ### Coefficients de détermination
 
@@ -144,10 +144,10 @@ $$R^2 = 1 - \sum_{i=1}^{n} \frac{y_i - \hat{y_i}}{y_i - \bar{y}}$$
 où $n$ désigne le nombre de mesures, $y_i$ désigne la mesure numéro $i$, $\hat{y_i}$ désigne la prédiction numéro $i$ et $\bar{y}$ désigne la valeur moyenne.
 Autrement dit, cela revient à mesurer le rapport entre l'erreur quadratique moyenne et la variance des mesures.
 
-| Heuristique | Coefficient de détermination |
-| ----------- | ---------------------------- |
-| Distance à la victoire | 0.46              |
-| Nombre de prises       | 0.68              |
+| Heuristique            | Coefficient de détermination |
+| :--------------------- | :--------------------------: |
+| Distance à la victoire |             0.46             |
+| Nombre de prises       |             0.68             |
 
 ## Résultats finaux
 

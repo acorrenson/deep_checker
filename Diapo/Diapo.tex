@@ -110,11 +110,17 @@ unsigned do_move_left(unsigned pos,
 \end{frame}
 
 \begin{frame}{Modélisation du problème}
-    Étant donné un ensemble $\mathcal{X}$ de parties simulées,
+    Étant donné un ensemble $\mathcal{DB}$ de parties simulées,
     on souhaite donner une première approximation de l'heuristique $h$.
     \begin{itemize}
-        \item On associe chaque coup apparaissant dans une partie $P \in X$ un score
-        \item Le score final d'un coup $c$ est la moyenne des scores qui lui sont attribués sur l'ensemble des parties dans $X$
+        \item On introduit une fonction d'évaluation $\lVert.\rVert_i : C_i \to [-1, 1]$
+        définie comme $\lVert c \rVert_i = \frac{1}{\sqrt{d(c)}}.v(c)$
+        \begin{itemize}
+            \item $C_i$ l'ensemble des coups dans une partie $P_i \in \mathcal{DB}$
+            \item $d(c) \in \mathbb{N}$ le nombre de coups qui séparent $c$ de la fin de partie
+            \item $v(c) = 1$ ou $v(c) = -1$ selon que la partie est gagnée ou perdue
+        \end{itemize}
+        \item Le score final d'un coup $c$ est la moyenne des scores qui lui sont attribués sur l'ensemble des parties dans $\mathcal{DB}$
     \end{itemize}
 \end{frame}
 
@@ -139,7 +145,11 @@ unsigned do_move_left(unsigned pos,
             18                          & 32                                \\ \hline
         \end{tabular}
     \end{center}
-    Cette version de l'heuristique est peu satisfaisante.
+    Cette version de l'heuristique est peu satisfaisante :
+    \begin{itemize}
+        \item La notation d'un coup met l'accent sur les variations très \textbf{locales}
+        \item La distance choisie rapproche uniquement les coups qui se ressemble en terme d'état \textbf{global} du jeu
+    \end{itemize}
 \end{frame}
 
 {\metroset{background=dark}\section{Amélioration de l'heuristique}}
