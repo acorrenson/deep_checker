@@ -32,11 +32,11 @@
         \begin{itemize}
             \item Construction d'une \alert{heuristique} évaluant la qualité des coups
             \item 3 problématiques :
-            \begin{itemize}
-                \item Génération des données
-                \item Choix des modèles
-                \item Mise en place des modèles
-            \end{itemize}
+                  \begin{itemize}
+                      \item Génération des données
+                      \item Choix des modèles
+                      \item Mise en place des modèles
+                  \end{itemize}
         \end{itemize}
         \column{0.4\textwidth}
         \begin{figure}
@@ -114,12 +114,12 @@ unsigned do_move_left(unsigned pos,
     on souhaite donner une première approximation de l'heuristique $h$.
     \begin{itemize}
         \item On introduit une fonction d'évaluation $\lVert.\rVert_i : C_i \to [-1, 1]$
-        définie comme $\lVert c \rVert_i = \frac{1}{\sqrt{d(c)}}.v(c)$
-        \begin{itemize}
-            \item $C_i$ l'ensemble des coups dans une partie $P_i \in \mathcal{DB}$
-            \item $d(c) \in \mathbb{N}$ le nombre de coups qui séparent $c$ de la fin de partie
-            \item $v(c) = 1$ ou $v(c) = -1$ selon que la partie est gagnée ou perdue
-        \end{itemize}
+              définie comme $\lVert c \rVert_i = \frac{1}{\sqrt{d(c)}}.v(c)$
+              \begin{itemize}
+                  \item $C_i$ l'ensemble des coups dans une partie $P_i \in \mathcal{DB}$
+                  \item $d(c) \in \mathbb{N}$ le nombre de coups qui séparent $c$ de la fin de partie
+                  \item $v(c) = 1$ ou $v(c) = -1$ selon que la partie est gagnée ou perdue
+              \end{itemize}
         \item Le score final d'un coup $c$ est la moyenne des scores qui lui sont attribués sur l'ensemble des parties dans $\mathcal{DB}$
     \end{itemize}
 \end{frame}
@@ -183,28 +183,28 @@ unsigned do_move_left(unsigned pos,
 {\metroset{background=dark}\section{Perceptron multicouche}}
 
 \begin{frame}{Crash course sur les réseaux de neurones}
-	\begin{figure}
-		\begin{tikzpicture}[node distance=1.5cm and 1.5cm]
-			\node[circle, draw] (X1) {$x_1$};
-			\node[circle, draw] (X2) [below=of X1] {$x_2$};
-			\node[circle, draw] (S1) [right=of X1] {$s_1$};
-			\node[circle, draw] (S2) [right=of X2] {$s_2$};
-			\node[circle, draw] (X1') [right=of S1] {$x_1$'};
-			\node[circle, draw] (X2') [right=of S2] {$x_2$'};
-			\node (M) at ($(X1') !.5! (X2')$) {};
-			\node[circle, draw] (S') [right=of M] {$s'$};
-			\node[circle, draw] (Y) [right=of S'] {$y$};
-			\path[->]
-				(X1) edge (S1) edge (S2)
-				(X2) edge (S1) edge (S2)
-				(S1) edge node[above] {$\sigma$} (X1')
-				(S2) edge node[above] {$\sigma$} (X2')
-				(X1') edge (S')
-				(X2') edge (S')
-				(S') edge node[above] {$\sigma$} (Y);
-		\end{tikzpicture}
-		\caption{Perceptron avec une couche cachée}
-	\end{figure}
+    \begin{figure}
+        \begin{tikzpicture}[node distance=1.5cm and 1.5cm]
+            \node[circle, draw] (X1) {$x_1$};
+            \node[circle, draw] (X2) [below=of X1] {$x_2$};
+            \node[circle, draw] (S1) [right=of X1] {$s_1$};
+            \node[circle, draw] (S2) [right=of X2] {$s_2$};
+            \node[circle, draw] (X1') [right=of S1] {$x_1$'};
+            \node[circle, draw] (X2') [right=of S2] {$x_2$'};
+            \node (M) at ($(X1') !.5! (X2')$) {};
+            \node[circle, draw] (S') [right=of M] {$s'$};
+            \node[circle, draw] (Y) [right=of S'] {$y$};
+            \path[->]
+            (X1) edge (S1) edge (S2)
+            (X2) edge (S1) edge (S2)
+            (S1) edge node[above] {$\sigma$} (X1')
+            (S2) edge node[above] {$\sigma$} (X2')
+            (X1') edge (S')
+            (X2') edge (S')
+            (S') edge node[above] {$\sigma$} (Y);
+        \end{tikzpicture}
+        \caption{Perceptron avec une couche cachée}
+    \end{figure}
     \begin{itemize}
         \item propagation : $s = W.x + b$, $x' = \sigma(s)$
         \item descente de gradient : $W \leftarrow W - \alpha \frac{\partial \Delta}{\partial W}$
@@ -232,13 +232,13 @@ unsigned do_move_left(unsigned pos,
 \end{frame}
 
 \begin{frame}{Coefficient de détermination}
-    $$R^2 = 1 - \sum_{i=1}^{n} \frac{y_i - \hat{y_i}}{y_i - \bar{y}}$$
+    $$R^2 = 1 - \sum_{i=1}^{n} \frac{(y_i - \hat{y_i})^2}{(y_i - \bar{y})^2}$$
     \begin{center}
         \begin{tabular}{ | l | c | }
             \hline
-            Heuristique & $R^2$ \\ \hline
-            Distance à la victoire & 0.46 \\ \hline
-            Nombre de prises & 0.68 \\ \hline
+            Heuristique            & $R^2$ \\ \hline
+            Distance à la victoire & 0.46  \\ \hline
+            Nombre de prises       & 0.68  \\ \hline
         \end{tabular}
     \end{center}
 \end{frame}
@@ -246,14 +246,14 @@ unsigned do_move_left(unsigned pos,
 \begin{frame}{Résultats finaux}
     \begin{center}
         \begin{tabular}{ | c || c | c |}
-            \hline 
-            Heuristiques + Models & Victoires & Défaites \\
-            \hline 
-            \hline 
-            Distance à la victoire + KNN & 18 & 32 \\
-            Nombre de prises + KNN & 36 & 14 \\
-            Distance à la victoire + MLP & 39 & 11 \\
-            Nombre de prises + MLP & 50 & 0 \\ \hline
+            \hline
+            Heuristiques + Models        & Victoires & Défaites \\
+            \hline
+            \hline
+            Distance à la victoire + KNN & 18        & 32       \\
+            Nombre de prises + KNN       & 36        & 14       \\
+            Distance à la victoire + MLP & 39        & 11       \\
+            Nombre de prises + MLP       & 50        & 0        \\ \hline
         \end{tabular}
 
     \end{center}
@@ -263,11 +263,11 @@ unsigned do_move_left(unsigned pos,
 {\metroset{background=dark}\section*{Conclusion}}
 
 \begin{frame}{Conclusion}
-    Pistes d'amélioration : 
+    Pistes d'amélioration :
     \begin{itemize}
         \item Heuristiques plus fines
         \item Techniques d'apprentissage par renforcement
-        \item Réseaux de neuronnes convolutifs
+        \item Réseaux de neurones convolutifs
         \item Arbre de Monte-Carlo
     \end{itemize}
 \end{frame}
@@ -282,13 +282,12 @@ unsigned do_move_left(unsigned pos,
 
         \item K-nearest nieghbors algorithm, \url{https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm}, Wikipédia
 
-        \item Scikit-learn: Machine Learning in Python \url{https://scikit-learn.org/stable/} Pedregosa et al. , \textbf{Journal of Machine Learning Research}, 2012
+        \item Scikit-learn: Machine Learning in Python \url{https://scikit-learn.org/stable/} Pedregosa et al., \textbf{Journal of Machine Learning Research}, 2012
 
         \item Levenshtein distance, \url{https://en.wikipedia.org/wiki/Levenshtein_distance}, Wikipédia
 
         \item Coefficient of determination, \url{https://en.wikipedia.org/wiki/Coefficient_of_determination}, Wikipédia
     \end{enumerate}
 \end{frame}
-
 
 \end{document}

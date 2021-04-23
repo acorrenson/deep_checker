@@ -140,7 +140,7 @@ Les résultats obtenus grâce au nouveau modèle sont bien plus intéressants. E
 
 Pour mesurer la qualité des prédictions de nos réseaux de neurones, on peut calculer le coefficient de détermination $R^2$ [**5**] sur un échantillon de test pour chacune des heuristiques.
 Ce coefficient est défini par
-$$R^2 = 1 - \sum_{i=1}^{n} \frac{y_i - \hat{y_i}}{y_i - \bar{y}}$$
+$$R^2 = 1 - \sum_{i=1}^{n} \frac{(y_i - \hat{y_i})^2}{(y_i - \bar{y})^2}$$
 où $n$ désigne le nombre de mesures, $y_i$ désigne la mesure numéro $i$, $\hat{y_i}$ désigne la prédiction numéro $i$ et $\bar{y}$ désigne la valeur moyenne.
 Autrement dit, cela revient à mesurer le rapport entre l'erreur quadratique moyenne et la variance des mesures.
 
