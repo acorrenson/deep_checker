@@ -81,6 +81,12 @@
 \end{frame}
 
 \begin{frame}[fragile]{Données et performances}
+    \begin{itemize}
+        \item Les données sont stockées dans un fichier texte. \newline
+              (perte d'efficacité contre simplicité de traitement des données)
+        \item Performances très satisfaisantes : \newline
+              \alert{10 000} parties générées en environ \alert{1 secondes}, sur un ordinateur ordinaire.
+    \end{itemize}
     \begin{verbatim}
 unsigned do_move_left(unsigned pos,
     unsigned *player, int direction) {
@@ -89,12 +95,6 @@ unsigned do_move_left(unsigned pos,
   return pos_next;
 }
     \end{verbatim}
-    \begin{itemize}
-        \item Les données sont stockées dans un fichier texte. \newline
-              (perte d'efficacité contre simplicité de traitement des données)
-        \item Performances très satisfaisantes : \newline
-              \alert{10 000} parties générées en environ \alert{1 secondes}, sur un ordinateur ordinaire.
-    \end{itemize}
 \end{frame}
 
 {\metroset{background=dark}\section{Modèles et heuristiques}}
@@ -139,7 +139,7 @@ unsigned do_move_left(unsigned pos,
 
 \begin{frame}{Résultat et performances de KNN}
     \begin{center}
-        \begin{tabular}{ | l | c | }
+        \begin{tabular}{ | c | c | }
             \hline
             Victoires du joueur 1 (KNN) & Victoires du joueur 2 (Aléatoire) \\ \hline
             18                          & 32                                \\ \hline
@@ -170,7 +170,7 @@ unsigned do_move_left(unsigned pos,
 
 \begin{frame}{Nouveaux résultats de KNN}
     \begin{center}
-        \begin{tabular}{ | l | c | }
+        \begin{tabular}{ | c | c | }
             \hline
             Victoires du joueur 1 (KNN) & Victoires du joueur 2 (Aléatoire) \\ \hline
             34                          & 16                                \\ \hline
@@ -222,7 +222,7 @@ unsigned do_move_left(unsigned pos,
 
 \begin{frame}{Résultats du perceptron multicouche}
     \begin{center}
-        \begin{tabular}{ | l | c | }
+        \begin{tabular}{ | c | c | }
             \hline
             Victoires du joueur 1 (MLP) & Victoires du joueur 2 (Aléatoire) \\ \hline
             50                          & 0                                 \\ \hline
@@ -245,7 +245,7 @@ unsigned do_move_left(unsigned pos,
 
 \begin{frame}{Résultats finaux}
     \begin{center}
-        \begin{tabular}{ | l || c | r |}
+        \begin{tabular}{ | c || c | c |}
             \hline 
             Heuristiques + Models & Victoires & Défaites \\
             \hline 
