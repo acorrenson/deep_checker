@@ -1,6 +1,13 @@
 \documentclass{beamer}
 \usetheme{metropolis}
 
+\metroset{progressbar=frametitle, titleformat=smallcaps, block=fill}
+\makeatletter
+\setlength{\metropolis@titleseparator@linewidth}{1pt}
+\setlength{\metropolis@progressonsectionpage@linewidth}{1.5pt}
+\setlength{\metropolis@progressinheadfoot@linewidth}{2pt}
+\makeatother
+
 \title{Deep Checker}
 \subtitle{Apprentissage statistique et intelligence artificielle}
 \date{}
@@ -163,5 +170,41 @@
     \end{center}
     $\rightarrow$ Heuristique bien plus satisfaisante, temps de calcul plus rapide
 \end{frame}
+
+\begin{frame}{Résultats finaux}
+    \begin{center}
+        \begin{tabular}{ | l || c | r |}
+            \hline 
+            Heuristiques + Models & Victoires & Défaites \\
+            \hline 
+            \hline 
+            Distance à la victoire + KNN & 18 & 32 \\
+            Nombre de prises + KNN & 36 & 14 \\
+            Distance à la victoire + MLP & 39 & 11 \\
+            Nombre de prises + MLP & 50 & 0 \\
+        \end{tabular}
+
+    \end{center}
+\end{frame}
+
+
+{\metroset{background=dark}\section*{Conclusion}}
+
+{\metroset{background=dark}\section*{Questions ?}}
+
+\begin{frame}{Références}
+    \begin{enumerate}
+        \item Multi Layer Perceptron, \href{https://en.wikipedia.org/wiki/Multilayer_perceptron}{}, Wikipédia
+
+        \item K-nearest nieghbors algorithm, \href{https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm}{}, Wikipédia
+
+        \item Scikit-learn: Machine Learning in Python \href{https://scikit-learn.org/stable/} Pedregosa, F. and Varoquaux, G. and Gramfort, A. and Michel, V. and Thirion, B. and Grisel, O. and Blondel, M. and Prettenhofer, P. and Weiss, R. and Dubourg, V. and Vanderplas, J. and Passos, A. and Cournapeau, D. and Brucher, M. and Perrot, M. and Duchesnay, E., \textbf{Journal of Machine Learning Research}, 2012
+
+[**4**] [*Levenshtein distance*](https://en.wikipedia.org/wiki/Levenshtein_distance), Wikipédia
+
+[**5**] [*Coefficient of determination*](https://en.wikipedia.org/wiki/Coefficient_of_determination), Wikipédia
+    \end{enumerate}
+\end{frame}
+
 
 \end{document}
